@@ -1,198 +1,124 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# Filename: lexicalrichness.py
-# Author: #cf
+
+import math
+import warnings
 
 
-"""
-Function to sample texts and calculate lexical richness measures.
-"""
+# ------------------------------------------------- #
+# MEASURES THAT USE SAMPLE SIZE AND VOCABULARY SIZE #
+# ------------------------------------------------- #
+
+def type_token_ratio(sample_size, vocabulary_size):
+    """"""
+    return vocabulary_size / sample_size
 
 
-# ===============
-# Import
-# ===============
-
-from collections import Counter
-from os.path import join
-import glob
-import numpy as np
-import os
-import pandas as pd
-import pygal
-import re
+def guiraud_r(sample_size, vocabulary_size):
+    """Guiraud (1954)"""
+    return vocabulary_size / math.sqrt(sample_size)
 
 
-mystyle = pygal.style.Style(
-    background='white',
-    plot_background='white',
-    font_family="FreeSans",
-    title_font_size=20,
-    legend_font_siz=14,
-    label_font_size=12,
-    major_label_font_size=12,
-    value_font_size=12,
-    major_value_font_size=12,
-    tooltip_font_size=12)
+def herdan_c(sample_size, vocabulary_size):
+    """Herdan (1960, 1964)"""
+    return math.log(vocabulary_size) / math.log(sample_size)
 
 
-# ===============
-# Parameters
-# ===============
-
-wdir = "/home/christof/Dropbox/0-Analysen/2017/lexicalrichness/"
-textpath = join(wdir, "texts", "*.txt")
-sampling = [2500, 50000, 50]    # min, max, steps
-makeplots = ["samplesize", "vocabsize", "meanwordfreq", "typetokenratio", "GuiraudR", "HerdanC", "DugastK", "MaasA", "TuldavaLN", "HonoreH", "SichelS", "MicheaM"]  # , "BrunetW"]
+def dugast_k(sample_size, vocabulary_size):
+    """Dugast (1979)"""
+    return math.log(vocabulary_size) / math.log(math.log(sample_size))
 
 
-# ===============
-# Functions
-# ===============
-
-def load_text(file):
-    """
-    Load the text file and turn it into a list of tokens.
-    """
-    with open(file, "r") as infile:
-        text = infile.read()
-        text = re.split("\W", text)
-        text = [word for word in text if word]
-        return text
+def maas_a2(sample_size, vocabulary_size):
+    """Maas (1972)"""
+    return (math.log(sample_size) - math.log(vocabulary_size)) / (math.log(sample_size) ** 2)
 
 
-def get_sample(text, samplesize):
-    """
-    Select a sample from the text with a given length.
-    "start" can be fixed or random within a given range.
-    If it is set to random, results will vary across runs.
-    """
-    start = 5
-    # start = random.randint(100,5100)
-    sample = text[start:start+samplesize]
-    return sample
+def dugast_u(sample_size, vocabulary_size):
+    """Dugast (1978, 1979)"""
+    return (math.log(sample_size) ** 2) / (math.log(sample_size) - math.log(vocabulary_size))
 
 
-def get_vocabsize(sample):
-    """
-    For a given sample, calculate the number of types (different tokens)
-    """
-    vocabsize = len(set(sample))
-    return vocabsize
+def tuldava_ln(sample_size, vocabulary_size):
+    """Tuldava (1977)"""
+    return (1 - (vocabulary_size ** 2)) / ((vocabulary_size ** 2) * math.log(sample_size))
 
 
-def get_numhapaxleg(sample):
-    """
-    For a given sample, calculate the number of hapax legomena.
-    """
-    counts = dict(Counter(sample))
-    counts = pd.DataFrame(counts, index=["freq"])
-    counts = counts.T
-    hapaxlegs = counts[(counts.freq == 1)]
-    numhapaxleg = len(hapaxlegs)
-    dislegs = counts[(counts.freq == 2)]
-    numdisleg = len(dislegs)
-    return numhapaxleg, numdisleg
+def brunet_w(sample_size, vocabulary_size):
+    """Brunet (1978)"""
+    a = -0.172
+    return sample_size ** (vocabulary_size ** -a)  # Check
 
 
-def get_measures(results):
-    """
-    Based on the basic indicators, calculate measures of lexical richness.
-    This part operates directly on the dataframe for better performance.
-    """
-    vsize = results.loc[:, "vocabsize"]
-    ssize = results.loc[:, "samplesize"]
-    hleg = results.loc[:, "numhapaxleg"]
-    dleg = results.loc[:, "numdisleg"]
-    results["meanwordfreq"] = ssize / vsize
-    results["typetokenratio"] = vsize / ssize
-    results["GuiraudR"] = vsize / np.sqrt(ssize)
-    results["HerdanC"] = np.log(vsize) / np.log(ssize)
-    results["DugastK"] = np.log(vsize) / np.log(np.log(ssize))
-    results["MaasA"] = (np.log(ssize) - np.log(vsize)) / np.log(np.log2(ssize))  # check
-    results["TuldavaLN"] = (1 - (vsize ^ 2)) / ((vsize ^ 2) * np.log(ssize))
-    results["HonoreH"] = 100 * np.log(ssize) / (1-(hleg/vsize))
-    results["SichelS"] = dleg / vsize
-    results["MicheaM"] = vsize / dleg
-    # results["BrunetW"] = ssize ^ (vsize ^ -0.172) #doesn't work
-    return results
+# ------------------------------------------------ #
+# MEASURES THAT USE PART OF THE FREQUENCY SPECTRUM #
+# ------------------------------------------------ #
+
+def sichel_s(vocabulary_size, frequency_spectrum):
+    """Sichel (1975)"""
+    return frequency_spectrum[2] / vocabulary_size
 
 
-def save_dataframe(results, resultsfile):
-    """
-    Save the table with indicators and measures to file.
-    There is one such results file per text analyzed.
-    All results from the samples from this text are included.
-    """
-    with open(resultsfile, "w") as outfile:
-        results.to_csv(outfile, sep="\t")
+def michea_m(vocabulary_size, frequency_spectrum):
+    """Michéa (1969, 1971)"""
+    return vocabulary_size / frequency_spectrum[2]
 
 
-def plot_results(wdir, makeplots, filename, results, sampling):
-    """
-    For each measure and each text, make a lineplot.
-    """
-    for measure in makeplots:
-        plotfolder = join(wdir, "plots", measure)
-        if not os.path.exists(plotfolder):
-            os.makedirs(plotfolder)
-        plotfile = join(plotfolder, filename + "_" + measure + ".svg")
-        data = list(results.loc[:, measure])
-        lineplot = pygal.XY(show_legend=False,
-                            style=mystyle,
-                            show_y_guides=True,
-                            stroke=True,
-                            show_x_guides=True,
-                            x_title="sample size",
-                            y_title=measure,
-                            title="Lexical Richness in " + filename + ": " + measure)
-        counter = 0
-        for point in data:
-            counter += 1
-            lineplot.add(str(sampling[0]+counter*sampling[2]), [{"value": (sampling[0]+counter*sampling[2], point), "color": "darkblue"}], dots_size=1)
-        lineplot.render_to_file(plotfile)
+def honore_h(sample_size, vocabulary_size, frequency_spectrum):
+    """Honoré (1979)"""
+    return 100 * (math.log(sample_size) / (1 - ((frequency_spectrum[1]) / (vocabulary_size))))
 
 
-# ===============
-# Main
-# ===============
+# ---------------------------------------------- #
+# MEASURES THAT USE THE WHOLE FREQUENCY SPECTRUM #
+# ---------------------------------------------- #
 
-def main(wdir, textpath, sampling, makeplots):
-    """
-    Coordinating function for the calculation of measures of lexical richness.
-    """
-    for file in glob.glob(textpath):
-        filename, ext = os.path.basename(file).split(".")
-        resultsfile = join(wdir, "data", "lexicalrichness_" + filename + ".csv")
-        print(filename)
-        text = load_text(file)
-        # Set up lists for the basic indicators
-        samplesizes = []
-        vocabsizes = []
-        numhapaxlegs = []
-        numdislegs = []
-        # For increasing sample size, calculate indicators
-        for samplesize in range(sampling[0], sampling[1], sampling[2]):
-            sample = get_sample(text, samplesize)
-            vocabsize = get_vocabsize(sample)
-            numhapaxleg, numdisleg = get_numhapaxleg(sample)
-            samplesizes.append(samplesize)
-            vocabsizes.append(vocabsize)
-            numhapaxlegs.append(numhapaxleg)
-            numdislegs.append(numdisleg)
-        results = pd.DataFrame({"samplesize": samplesizes,
-                                "vocabsize": vocabsizes,
-                                "numhapaxleg": numhapaxlegs,
-                                "numdisleg": numdislegs})
-        # Calculate a number of measures of lexical richness
-        results = get_measures(results)
-        # Save numeric results to file and plot them
-        save_dataframe(results, resultsfile)
-        plot_results(wdir, makeplots, filename, results, sampling)
-        # TODO: join all dataframes into one big panel object.
-        # Then you could get the value for any combination of
-        # text analyzed, samplesize, and measure,
-        # or the list of values for any of two criteria.
+def entropy(sample_size, frequency_spectrum):
+    """"""
+    return sum((freq_size * (- math.log(freq / sample_size)) * (freq / sample_size) for freq, freq_size in frequency_spectrum.items()))
 
 
-main(wdir, textpath, sampling, makeplots)
+def yule_k(sample_size, frequency_spectrum):
+    """Yule (1944)"""
+    return 10000 * ((sum((freq_size * (freq / sample_size) ** 2 for freq, freq_size in frequency_spectrum.items())) - sample_size) / (sample_size ** 2))
+
+
+def simpson_d(sample_size, frequency_spectrum):
+    """"""
+    return sum((freq_size * (freq / sample_size) * ((freq - 1) / (sample_size - 1)) for freq, freq_size in frequency_spectrum.items()))
+
+
+def herdan_vm(sample_size, vocabulary_size, frequency_spectrum):
+    """Herdan (1955)"""
+    return math.sqrt(sum((freq_size * (freq / sample_size) ** 2 for freq, freq_size in frequency_spectrum.items())) - (1 / vocabulary_size))
+
+
+# ---------------------------------- #
+# PARAMETERS OF PROBABILISTIC MODELS #
+# ---------------------------------- #
+
+def orlov_z(sample_size, vocabulary_size, frequency_spectrum, max_iterations=100, min_tolerance=1):
+    """Orlov (1983)"""
+    most_frequent = max(frequency_spectrum.keys())
+    p_star = most_frequent / sample_size
+    lower_z, upper_z = None, None
+    z = int(sample_size / 100)  # our initial guess
+    for i in range(max_iterations):
+        estimated_vocabulary_size = (z / math.log(p_star * z)) * (sample_size / (sample_size - z)) * math.log(sample_size / z)
+        if abs(vocabulary_size - estimated_vocabulary_size) <= min_tolerance:
+            print(i, z)
+            break
+        if estimated_vocabulary_size < vocabulary_size:
+            lower_z = z
+            if upper_z is not None:
+                z = int((z + upper_z) / 2)
+            else:
+                z *= 2
+        else:
+            upper_z = z
+            if lower_z is not None:
+                z = int((z + lower_z) / 2)
+            else:
+                z = int(z / 2)
+    else:
+        warnings.warn("Exceeded max_iterations")
+    return z
