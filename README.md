@@ -33,8 +33,8 @@ and stylistic complexity of (literary) texts.
 
 ## Links ##
 
-  * Implementierung von vocd u MTLD in Perl: <http://search.cpan.org/~axanthos/Lingua-Diversity-0.07/>
-  * MTLD und HD-D in Python: <https://github.com/jfrens/lexical_diversity>
-  * Implementierung in R: <http://docs.quanteda.io/index.html>
-  * Implementierung in R: <http://reaktanz.de/?c=hacking&s=koRpus>
+  * Implementation of vocd and MTLD in Perl: <http://search.cpan.org/~axanthos/Lingua-Diversity-0.07/>
+  * MTLD and HD-D in Python: <https://github.com/jfrens/lexical_diversity>
+  * Implementation in R: <http://docs.quanteda.io/index.html>
+  * Implementation in R: <http://reaktanz.de/?c=hacking&s=koRpus>
 
