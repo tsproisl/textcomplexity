@@ -9,7 +9,7 @@ and stylistic complexity of (literary) texts.
   * Guiraud's R
   * Herdan's C
   * Dugast's k
-  * Maas' a^2
+  * Maas' a<sup>2</sup>
   * Dugast's U
   * Tuldava's LN
   * Brunet's W
@@ -25,7 +25,7 @@ and stylistic complexity of (literary) texts.
   * Entropy
   * Yule's K
   * Simpson's D
-  * Herdan's V_m
+  * Herdan's V<sub>m</sub>
 
 ## Parameters of probabilistic models ##
 
