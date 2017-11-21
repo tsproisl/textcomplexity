@@ -1,4 +1,7 @@
-# Vocabulary Richness #
+# Linguistic and Stylistic Complexity #
+
+This project is a collection of measures that assess the linguistic
+and stylistic complexity of (literary) texts.
 
 ## Links ##
 
