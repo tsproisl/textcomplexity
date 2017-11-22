@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import collections
 import math
+import statistics
 import warnings
 
 
@@ -122,3 +124,41 @@ def orlov_z(sample_size, vocabulary_size, frequency_spectrum, max_iterations=100
     else:
         warnings.warn("Exceeded max_iterations")
     return z
+
+
+# -------------------------------- #
+# MEASURES THAT USE THE WHOLE TEXT #
+# -------------------------------- #
+
+def MATTR_(wordlist, winsize):
+    results = []
+    word_count = collections.Counter(wordlist[0:winsize])
+    for win_start in range(1, len(wordlist)-(winsize+1)):
+        win_end = win_start + winsize
+        word_count[wordlist[win_start-1]] -= 1
+        if word_count[wordlist[win_start-1]] == 0:
+            del(word_count[wordlist[win_start-1]])
+        word_count[wordlist[win_end]] += 1
+        results.append(len(word_count.values())/winsize)  # calculate ttr for the text window
+    return results
+
+
+def MATTR(wordlist, winsize=1000):
+    """
+    Calculate The Moving-Average Type-Token Ratio
+    M.A. Covington,J.D. McFall: Cutting the Gordon Knot. In: Journal of Quantitative
+    Linguistics 17,2 (2010), p. 94-100.
+    DOI: 10.1080/09296171003643098
+
+    >>> a = np.array(50*['a'] + 50*['b'])
+    >>> b = np.array(10*['a'] + 10*['b'] + 10*['c'] + 10*['d'] + 10*['e'] + 10*['f'] \
+                     + 10*['g'] + 10*['h'] + 10*['i'] + 10*['j'])
+    >>> np.random.seed(3)
+    >>> np.random.shuffle(a)
+    >>> np.random.shuffle(b)
+    >>> MATTR(a, 10)
+    0.2
+    >>> MATTR(b, 10)
+    0.6875
+    """
+    return statistics.mean(MATTR_(wordlist, winsize))
