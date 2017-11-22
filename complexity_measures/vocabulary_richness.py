@@ -5,50 +5,52 @@ import math
 import statistics
 import warnings
 
+import scipy.stats
+
 
 # ------------------------------------------------- #
 # MEASURES THAT USE SAMPLE SIZE AND VOCABULARY SIZE #
 # ------------------------------------------------- #
 
-def type_token_ratio(sample_size, vocabulary_size):
+def type_token_ratio(text_length, vocabulary_size):
     """"""
-    return vocabulary_size / sample_size
+    return vocabulary_size / text_length
 
 
-def guiraud_r(sample_size, vocabulary_size):
+def guiraud_r(text_length, vocabulary_size):
     """Guiraud (1954)"""
-    return vocabulary_size / math.sqrt(sample_size)
+    return vocabulary_size / math.sqrt(text_length)
 
 
-def herdan_c(sample_size, vocabulary_size):
+def herdan_c(text_length, vocabulary_size):
     """Herdan (1960, 1964)"""
-    return math.log(vocabulary_size) / math.log(sample_size)
+    return math.log(vocabulary_size) / math.log(text_length)
 
 
-def dugast_k(sample_size, vocabulary_size):
+def dugast_k(text_length, vocabulary_size):
     """Dugast (1979)"""
-    return math.log(vocabulary_size) / math.log(math.log(sample_size))
+    return math.log(vocabulary_size) / math.log(math.log(text_length))
 
 
-def maas_a2(sample_size, vocabulary_size):
+def maas_a2(text_length, vocabulary_size):
     """Maas (1972)"""
-    return (math.log(sample_size) - math.log(vocabulary_size)) / (math.log(sample_size) ** 2)
+    return (math.log(text_length) - math.log(vocabulary_size)) / (math.log(text_length) ** 2)
 
 
-def dugast_u(sample_size, vocabulary_size):
+def dugast_u(text_length, vocabulary_size):
     """Dugast (1978, 1979)"""
-    return (math.log(sample_size) ** 2) / (math.log(sample_size) - math.log(vocabulary_size))
+    return (math.log(text_length) ** 2) / (math.log(text_length) - math.log(vocabulary_size))
 
 
-def tuldava_ln(sample_size, vocabulary_size):
+def tuldava_ln(text_length, vocabulary_size):
     """Tuldava (1977)"""
-    return (1 - (vocabulary_size ** 2)) / ((vocabulary_size ** 2) * math.log(sample_size))
+    return (1 - (vocabulary_size ** 2)) / ((vocabulary_size ** 2) * math.log(text_length))
 
 
-def brunet_w(sample_size, vocabulary_size):
+def brunet_w(text_length, vocabulary_size):
     """Brunet (1978)"""
     a = -0.172
-    return sample_size ** (vocabulary_size ** -a)  # Check
+    return text_length ** (vocabulary_size ** -a)  # Check
 
 
 # ------------------------------------------------ #
@@ -65,47 +67,52 @@ def michea_m(vocabulary_size, frequency_spectrum):
     return vocabulary_size / frequency_spectrum[2]
 
 
-def honore_h(sample_size, vocabulary_size, frequency_spectrum):
+def honore_h(text_length, vocabulary_size, frequency_spectrum):
     """Honoré (1979)"""
-    return 100 * (math.log(sample_size) / (1 - ((frequency_spectrum[1]) / (vocabulary_size))))
+    return 100 * (math.log(text_length) / (1 - ((frequency_spectrum[1]) / (vocabulary_size))))
 
 
 # ---------------------------------------------- #
 # MEASURES THAT USE THE WHOLE FREQUENCY SPECTRUM #
 # ---------------------------------------------- #
 
-def entropy(sample_size, frequency_spectrum):
+def entropy(text_length, frequency_spectrum):
     """"""
-    return sum((freq_size * (- math.log(freq / sample_size)) * (freq / sample_size) for freq, freq_size in frequency_spectrum.items()))
+    return sum((freq_size * (- math.log(freq / text_length)) * (freq / text_length) for freq, freq_size in frequency_spectrum.items()))
 
 
-def yule_k(sample_size, frequency_spectrum):
+def yule_k(text_length, frequency_spectrum):
     """Yule (1944)"""
-    return 10000 * ((sum((freq_size * (freq / sample_size) ** 2 for freq, freq_size in frequency_spectrum.items())) - sample_size) / (sample_size ** 2))
+    return 10000 * ((sum((freq_size * (freq / text_length) ** 2 for freq, freq_size in frequency_spectrum.items())) - text_length) / (text_length ** 2))
 
 
-def simpson_d(sample_size, frequency_spectrum):
+def simpson_d(text_length, frequency_spectrum):
     """"""
-    return sum((freq_size * (freq / sample_size) * ((freq - 1) / (sample_size - 1)) for freq, freq_size in frequency_spectrum.items()))
+    return sum((freq_size * (freq / text_length) * ((freq - 1) / (text_length - 1)) for freq, freq_size in frequency_spectrum.items()))
 
 
-def herdan_vm(sample_size, vocabulary_size, frequency_spectrum):
+def herdan_vm(text_length, vocabulary_size, frequency_spectrum):
     """Herdan (1955)"""
-    return math.sqrt(sum((freq_size * (freq / sample_size) ** 2 for freq, freq_size in frequency_spectrum.items())) - (1 / vocabulary_size))
+    return math.sqrt(sum((freq_size * (freq / text_length) ** 2 for freq, freq_size in frequency_spectrum.items())) - (1 / vocabulary_size))
+
+
+def hdd(text_length, frequency_spectrum, sample_size=42):
+    """McCarthy and Jarvis (2010)"""
+    return sum(((1 - scipy.stats.hypergeom.pmf(0, text_length, freq, sample_size)) / sample_size for word, freq in frequency_spectrum.items()))
 
 
 # ---------------------------------- #
 # PARAMETERS OF PROBABILISTIC MODELS #
 # ---------------------------------- #
 
-def orlov_z(sample_size, vocabulary_size, frequency_spectrum, max_iterations=100, min_tolerance=1):
+def orlov_z(text_length, vocabulary_size, frequency_spectrum, max_iterations=100, min_tolerance=1):
     """Orlov (1983)"""
     most_frequent = max(frequency_spectrum.keys())
-    p_star = most_frequent / sample_size
+    p_star = most_frequent / text_length
     lower_z, upper_z = None, None
-    z = int(sample_size / 100)  # our initial guess
+    z = int(text_length / 100)  # our initial guess
     for i in range(max_iterations):
-        estimated_vocabulary_size = (z / math.log(p_star * z)) * (sample_size / (sample_size - z)) * math.log(sample_size / z)
+        estimated_vocabulary_size = (z / math.log(p_star * z)) * (text_length / (text_length - z)) * math.log(text_length / z)
         if abs(vocabulary_size - estimated_vocabulary_size) <= min_tolerance:
             print(i, z)
             break
