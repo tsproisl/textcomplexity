@@ -31,6 +31,10 @@ and stylistic complexity of (literary) texts.
 
   * Orlov's Z
 
+## Measures that use the whole text ##
+
+  * Covington and McFall's MATTR
+
 ## Links ##
 
   * Implementation of vocd and MTLD in Perl: <http://search.cpan.org/~axanthos/Lingua-Diversity-0.07/>
