@@ -26,6 +26,7 @@ and stylistic complexity of (literary) texts.
   * Yule's K
   * Simpson's D
   * Herdan's V<sub>m</sub>
+  * McCarthy and Jarvis' HD-D
 
 ## Parameters of probabilistic models ##
 
