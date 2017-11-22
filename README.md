@@ -34,6 +34,7 @@ and stylistic complexity of (literary) texts.
 ## Measures that use the whole text ##
 
   * Covington and McFall's MATTR
+  * MTLD
 
 ## Links ##
 
