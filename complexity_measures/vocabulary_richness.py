@@ -151,3 +151,34 @@ def mattr(tokens, window_size=1000):
         # type-token ratio for the current window:
         ttr_values.append(len(window_frequencies) / window_size)
     return statistics.mean(ttr_values)
+
+
+def mtld(tokens, factor_size=0.72):
+    """Implementation following the description in McCarthy and Jarvis
+    (2010).
+
+    """
+    def _mtld(tokens, factor_size, reverse=False):
+        factors = 0
+        factor_lengths = []
+        types = set()
+        token_count = 0
+        token_iterator = iter(tokens)
+        if reverse:
+            token_iterator = reversed(tokens)
+        for token in token_iterator:
+            types.add(token)
+            token_count += 1
+            if len(types) / token_count <= factor_size:
+                factors += 1
+                factor_lengths.append(token_count)
+                types = set()
+                token_count = 0
+        if token_count > 0:
+            ttr = len(types) / token_count
+            factors += (1 - ttr) / (1 - factor_size)
+            factor_lengths.append(token_count)
+        return len(tokens) / sum(factors)
+    forward_mtld = _mtld(tokens, factor_size)
+    reverse_mtld = _mtld(tokens, factor_size, reverse=True)
+    return statistics.mean((forward_mtld, reverse_mtld))
