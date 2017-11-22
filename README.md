@@ -13,6 +13,8 @@ and stylistic complexity of (literary) texts.
   * Dugast's U
   * Tuldava's LN
   * Brunet's W
+  * Carroll's CTTR
+  * Summer's S
 
 ## Measures that use part of the frequency spectrum ##
 
@@ -39,8 +41,5 @@ and stylistic complexity of (literary) texts.
 
 ## Links ##
 
-  * Implementation of vocd and MTLD in Perl: <http://search.cpan.org/~axanthos/Lingua-Diversity-0.07/>
-  * MTLD and HD-D in Python: <https://github.com/jfrens/lexical_diversity>
-  * Implementation in R: <http://docs.quanteda.io/index.html>
-  * Implementation in R: <http://reaktanz.de/?c=hacking&s=koRpus>
+  * Implementation of various measures in R: <http://reaktanz.de/?c=hacking&s=koRpus>
 
