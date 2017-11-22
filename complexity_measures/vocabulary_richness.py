@@ -53,6 +53,16 @@ def brunet_w(text_length, vocabulary_size):
     return text_length ** (vocabulary_size ** -a)  # Check
 
 
+def cttr(text_length, vocabulary_size):
+    """Carroll's Corrected Type-Token Ration"""
+    return vocabulary_size / math.sqrt(2 * text_length)
+
+
+def summer_s(text_length, vocabulary_size):
+    """Summer's S index"""
+    return math.log(math.log(vocabulary_size)) / math.log(math.log(text_length))
+
+
 # ------------------------------------------------ #
 # MEASURES THAT USE PART OF THE FREQUENCY SPECTRUM #
 # ------------------------------------------------ #
@@ -83,7 +93,7 @@ def entropy(text_length, frequency_spectrum):
 
 def yule_k(text_length, frequency_spectrum):
     """Yule (1944)"""
-    return 10000 * ((sum((freq_size * (freq / text_length) ** 2 for freq, freq_size in frequency_spectrum.items())) - text_length) / (text_length ** 2))
+    return 10000 * (sum((freq_size * (freq / text_length) ** 2 for freq, freq_size in frequency_spectrum.items())) - (1 / text_length))
 
 
 def simpson_d(text_length, frequency_spectrum):
