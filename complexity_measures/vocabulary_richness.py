@@ -199,3 +199,28 @@ def mtld(tokens, factor_size=0.72):
     forward_mtld = _mtld(tokens, factor_size)
     reverse_mtld = _mtld(tokens, factor_size, reverse=True)
     return statistics.mean((forward_mtld, reverse_mtld))
+
+
+def sttr_ci(results):
+    """calculate the confidence interval for sttr """
+    return 1.96 * statistics.stdev(results) / math.sqrt(len(results))
+
+
+def sttr(tokens, winsize=1000, ci=False):
+    """
+    calculate standardized type-token ratio
+    originally Kubat&Milicka 2013. Much better explained
+    in Evert et al. 2017.
+    :param tokens:
+    :param winsize: int size of text chunk, ttr is calculated on
+    :param ci:  boolean additionally calculate and return the confidence interval
+    :return:  if ci = False, returns sttr, if ci = True, returns tuple, (sttr, ci)
+    """
+    results = []
+    for i in range(int(len(tokens) / winsize)):  #ignore last partial chunk
+        results.append(type_token_ratio(tokens[i * winsize:(i * winsize) + winsize]))
+    if not ci:
+        return statistics.mean(results)
+    else:
+        return (statistics.mean(results), sttr_ci(results))
+
