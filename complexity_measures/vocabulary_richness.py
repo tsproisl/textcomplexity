@@ -207,14 +207,10 @@ def sttr_ci(results):
 
 
 def sttr(tokens, winsize=1000, ci=False):
-    """
-    calculate standardized type-token ratio
+    """calculate standardized type-token ratio
     originally Kubat&Milicka 2013. Much better explained
     in Evert et al. 2017.
-    :param tokens:
-    :param winsize: int size of text chunk, ttr is calculated on
-    :param ci:  boolean additionally calculate and return the confidence interval
-    :return:  if ci = False, returns sttr, if ci = True, returns tuple, (sttr, ci)
+    :param ci:  additionally calculate and return the confidence interval, returns a tuple
     """
     results = []
     for i in range(int(len(tokens) / winsize)):  #ignore last partial chunk
