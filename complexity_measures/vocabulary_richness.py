@@ -214,9 +214,36 @@ def sttr(tokens, winsize=1000, ci=False):
     """
     results = []
     for i in range(int(len(tokens) / winsize)):  #ignore last partial chunk
-        results.append(type_token_ratio(tokens[i * winsize:(i * winsize) + winsize]))
+        text_length, vocabulary_size = preprocess(tokens[i * winsize:(i * winsize) + winsize])
+        results.append(type_token_ratio(text_length, vocabulary_size))
     if not ci:
         return statistics.mean(results)
     else:
         return (statistics.mean(results), sttr_ci(results))
+
+
+def preprocess(tokens):
+    """TODO: add option to calculate frequence spectrum"""
+    return len(tokens), len(set(tokens))
+
+
+def bootstrap(tokens, metric='type_token_ratio', winsize=1000, ci=False):
+    """calculate bootstrap for lex diversity measures
+    as explained in Evert et al. 2017. if metric='type_token_ratio' it calculates
+    standardized type-token ratio
+    :param ci:  additionally calculate and return the confidence interval, returns a tuple
+    """
+    results = []
+    metrics = dict(type_token_ratio=type_token_ratio, guiraud_r=guiraud_r, herdan_c=herdan_c, dugast_k=dugast_k, \
+                   maas_a2=maas_a2, dugast_u=dugast_u, tuldava_ln=tuldava_ln, brunet_w=brunet_w, cttr=cttr,\
+                   summer_s=summer_s)
+    func = metrics[metric]
+    for i in range(int(len(tokens) / winsize)):  #ignore last partial chunk
+        text_length, vocabulary_size = preprocess(tokens[i * winsize:(i * winsize) + winsize])
+        results.append(func(text_length, vocabulary_size ))
+    if not ci:
+        return statistics.mean(results)
+    else:
+        return (statistics.mean(results), sttr_ci(results))
+
 
