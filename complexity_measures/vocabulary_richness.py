@@ -124,7 +124,6 @@ def orlov_z(text_length, vocabulary_size, frequency_spectrum, max_iterations=100
     for i in range(max_iterations):
         estimated_vocabulary_size = (z / math.log(p_star * z)) * (text_length / (text_length - z)) * math.log(text_length / z)
         if abs(vocabulary_size - estimated_vocabulary_size) <= min_tolerance:
-            print(i, z)
             break
         if estimated_vocabulary_size < vocabulary_size:
             lower_z = z
@@ -195,7 +194,7 @@ def mtld(tokens, factor_size=0.72):
             ttr = len(types) / token_count
             factors += (1 - ttr) / (1 - factor_size)
             factor_lengths.append(token_count)
-        return len(tokens) / sum(factors)
+        return len(tokens) / factors
     forward_mtld = _mtld(tokens, factor_size)
     reverse_mtld = _mtld(tokens, factor_size, reverse=True)
     return statistics.mean((forward_mtld, reverse_mtld))
