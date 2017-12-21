@@ -201,33 +201,45 @@ def mtld(tokens, factor_size=0.72):
     return statistics.mean((forward_mtld, reverse_mtld))
 
 
-def sttr_ci(results):
+def _sttr_ci(results):
     """calculate the confidence interval for sttr """
     return 1.96 * statistics.stdev(results) / math.sqrt(len(results))
 
 
-def sttr(tokens, winsize=1000, ci=False):
+def sttr(tokens, window_size=1000, ci=False):
     """calculate standardized type-token ratio
     originally Kubat&Milicka 2013. Much better explained
     in Evert et al. 2017.
     :param ci:  additionally calculate and return the confidence interval, returns a tuple
     """
     results = []
-    for i in range(int(len(tokens) / winsize)):  # ignore last partial chunk
-        text_length, vocabulary_size = preprocess(tokens[i * winsize:(i * winsize) + winsize])
+    for i in range(int(len(tokens) / window_size)):  # ignore last partial chunk
+        text_length, vocabulary_size = preprocess(tokens[i * window_size:(i * window_size) + window_size])
         results.append(type_token_ratio(text_length, vocabulary_size))
     if not ci:
         return statistics.mean(results)
     else:
-        return (statistics.mean(results), sttr_ci(results))
+        return (statistics.mean(results), _sttr_ci(results))
 
 
-def preprocess(tokens):
-    """TODO: add option to calculate frequence spectrum"""
-    return len(tokens), len(set(tokens))
+def preprocess(tokens, fs=False):
+    """Return text length, vocabulary size and optionally the frequency
+    spectrum.
+
+    :param fs: additionally calculate and return the frequency
+               spectrum
+
+    """
+    text_length = len(tokens)
+    vocabulary_size = len(set(tokens))
+    if fs:
+        frequency_list = collections.Counter(tokens)
+        frequency_spectrum = dict(collections.Counter(frequency_list.values()))
+        return text_length, vocabulary_size, frequency_spectrum
+    return text_length, vocabulary_size
 
 
-def bootstrap(tokens, metric='type_token_ratio', winsize=1000, ci=False):
+def bootstrap(tokens, metric='type_token_ratio', window_size=1000, ci=False):
     """calculate bootstrap for lex diversity measures
     as explained in Evert et al. 2017. if metric='type_token_ratio' it calculates
     standardized type-token ratio
@@ -240,10 +252,10 @@ def bootstrap(tokens, metric='type_token_ratio', winsize=1000, ci=False):
                    dugast_u=dugast_u, tuldava_ln=tuldava_ln,
                    brunet_w=brunet_w, cttr=cttr, summer_s=summer_s)
     func = metrics[metric]
-    for i in range(int(len(tokens) / winsize)):  # ignore last partial chunk
-        text_length, vocabulary_size = preprocess(tokens[i * winsize:(i * winsize) + winsize])
+    for i in range(int(len(tokens) / window_size)):  # ignore last partial chunk
+        text_length, vocabulary_size = preprocess(tokens[i * window_size:(i * window_size) + window_size])
         results.append(func(text_length, vocabulary_size))
     if not ci:
         return statistics.mean(results)
     else:
-        return (statistics.mean(results), sttr_ci(results))
+        return (statistics.mean(results), _sttr_ci(results))
