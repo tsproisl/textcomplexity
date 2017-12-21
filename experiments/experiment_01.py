@@ -60,11 +60,17 @@ def main():
     tokens = read_directory_gutenberg("/data/Thomas/Kallimachos/Gutenberg_ed13_tokenized",
                                       "/data/Thomas/Kallimachos/meta_gutenberg_ed13_native_speakers.csv",
                                       "experiment_01.d/Gutenberg_ed13_meta.csv")
+    # measures = ["type_token_ratio", "guiraud_r", "herdan_c",
+    #             "dugast_k", "maas_a2", "dugast_u", "tuldava_ln", "brunet_w",
+    #             "cttr", "summer_s", "sichel_s", "michea_m", "honore_h",
+    #             "herdan_vm", "orlov_z", "entropy", "yule_k", "simpson_d", "hdd",
+    #             "mtld"]
+    # No orlov_z:
     measures = ["type_token_ratio", "guiraud_r", "herdan_c",
-                "dugast_k", "maas_a2", "dugast_u", "tuldava_ln", "brunet_w",
-                "cttr", "summer_s", "sichel_s", "michea_m", "honore_h",
-                "herdan_vm", "orlov_z", "entropy", "yule_k", "simpson_d", "hdd",
-                "mtld"]
+                "dugast_k", "maas_a2", "dugast_u", "tuldava_ln",
+                "brunet_w", "cttr", "summer_s", "sichel_s",
+                "michea_m", "honore_h", "herdan_vm", "entropy",
+                "yule_k", "simpson_d", "hdd", "mtld"]
     window_sizes = list(range(1000, 10001, 1000))
     results = {m: {w: None} for m in measures for w in window_sizes}
     # results["mattr"] = {w: None for w in window_sizes}
