@@ -216,10 +216,9 @@ def sttr(tokens, window_size=1000, ci=False):
     for i in range(int(len(tokens) / window_size)):  # ignore last partial chunk
         text_length, vocabulary_size = preprocess(tokens[i * window_size:(i * window_size) + window_size])
         results.append(type_token_ratio(text_length, vocabulary_size))
-    if not ci:
-        return statistics.mean(results)
-    else:
+    if ci:
         return (statistics.mean(results), _sttr_ci(results))
+    return statistics.mean(results)
 
 
 def preprocess(tokens, fs=False):
@@ -239,23 +238,55 @@ def preprocess(tokens, fs=False):
     return text_length, vocabulary_size
 
 
-def bootstrap(tokens, metric='type_token_ratio', window_size=1000, ci=False):
+def bootstrap(tokens, measure='type_token_ratio', window_size=1000, ci=False, raw=False):
     """calculate bootstrap for lex diversity measures
-    as explained in Evert et al. 2017. if metric='type_token_ratio' it calculates
+    as explained in Evert et al. 2017. if measure='type_token_ratio' it calculates
     standardized type-token ratio
     :param ci:  additionally calculate and return the confidence interval, returns a tuple
+    :param raw:  return the raw results
     """
     results = []
-    metrics = dict(type_token_ratio=type_token_ratio,
-                   guiraud_r=guiraud_r, herdan_c=herdan_c,
-                   dugast_k=dugast_k, maas_a2=maas_a2,
-                   dugast_u=dugast_u, tuldava_ln=tuldava_ln,
-                   brunet_w=brunet_w, cttr=cttr, summer_s=summer_s)
-    func = metrics[metric]
+    # text_length, vocabulary_size
+    measures = dict(type_token_ratio=type_token_ratio,
+                    guiraud_r=guiraud_r, herdan_c=herdan_c,
+                    dugast_k=dugast_k, maas_a2=maas_a2,
+                    dugast_u=dugast_u, tuldava_ln=tuldava_ln,
+                    brunet_w=brunet_w, cttr=cttr, summer_s=summer_s,
+                    sichel_s=sichel_s, michea_m=michea_m,
+                    honore_h=honore_h, entropy=entropy, yule_k=yule_k,
+                    simpson_d=simpson_d, herdan_vm=herdan_vm, hdd=hdd,
+                    orlov_z=orlov_z, mtld=mtld)
+    # tl_vs: text_length, vocabulary_size
+    # vs_fs: vocabulary_size, frequency_spectrum
+    # tl_vs_fs: text_length, vocabulary_size, frequency_spectrum
+    # tl_fs: text_length, frequency_spectrum
+    # t: tokens
+    classes = dict(tl_vs=("type_token_ratio", "guiraud_r", "herdan_c",
+                          "dugast_k", "maas_a2", "dugast_u",
+                          "tuldava_ln", "brunet_w", "cttr",
+                          "summer_s"),
+                   vs_fs=("sichel_s", "michea_m"),
+                   tl_vs_fs=("honore_h", "herdan_vm", "orlov_z"),
+                   tl_fs=("entropy", "yule_k", "simpson_d", "hdd"),
+                   t=("mtld",))
+    measure_to_class = {m: c for c, v in classes.items() for m in v}
+    func = measures[measure]
+    cls = measure_to_class[measure]
     for i in range(int(len(tokens) / window_size)):  # ignore last partial chunk
-        text_length, vocabulary_size = preprocess(tokens[i * window_size:(i * window_size) + window_size])
-        results.append(func(text_length, vocabulary_size))
-    if not ci:
-        return statistics.mean(results)
-    else:
+        text_length, vocabulary_size, frequency_spectrum = preprocess(tokens[i * window_size:(i * window_size) + window_size], fs=True)
+        if cls == "tl_vs":
+            result = func(text_length, vocabulary_size)
+        elif cls == "vs_fs":
+            result = func(vocabulary_size, frequency_spectrum)
+        elif cls == "tl_vs_fs":
+            result = func(text_length, vocabulary_size, frequency_spectrum)
+        elif cls == "tl_fs":
+            result = func(text_length, frequency_spectrum)
+        elif cls == "t":
+            result = func(tokens)
+        results.append(result)
+    if raw:
+        return results
+    if ci:
         return (statistics.mean(results), _sttr_ci(results))
+    return statistics.mean(results)
