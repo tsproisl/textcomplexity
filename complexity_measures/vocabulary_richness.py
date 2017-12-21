@@ -246,7 +246,6 @@ def bootstrap(tokens, measure='type_token_ratio', window_size=1000, ci=False, ra
     :param raw:  return the raw results
     """
     results = []
-    # text_length, vocabulary_size
     measures = dict(type_token_ratio=type_token_ratio,
                     guiraud_r=guiraud_r, herdan_c=herdan_c,
                     dugast_k=dugast_k, maas_a2=maas_a2,
