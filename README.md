@@ -38,6 +38,7 @@ and stylistic complexity of (literary) texts.
 
   * Covington and McFall's MATTR
   * MTLD
+  * Kubat and Milicka's STTR
 
 ## Links ##
 
