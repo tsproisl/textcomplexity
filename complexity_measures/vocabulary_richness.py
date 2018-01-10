@@ -137,7 +137,6 @@ def orlov_z(text_length, vocabulary_size, frequency_spectrum, max_iterations=100
         # print(i, text_length, vocabulary_size, p_star, z)
         next_z = z - (function(text_length, vocabulary_size, p_star, z) / derivative(text_length, vocabulary_size, p_star, z))
         abs_diff = abs(z - next_z)
-        z = max(next_z, 0.001)
         if abs_diff <= min_tolerance:
             break
     else:
