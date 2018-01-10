@@ -121,22 +121,32 @@ def orlov_z(text_length, vocabulary_size, frequency_spectrum, max_iterations=100
     p_star = most_frequent / text_length
     lower_z, upper_z = None, None
     z = int(text_length / 100)  # our initial guess
+    # print("text_length: %d, vocabulary_size: %d, p_star: %.4f, initial z: %d" % (text_length, vocabulary_size, p_star, z))
     for i in range(max_iterations):
-        estimated_vocabulary_size = (z / math.log(p_star * z)) * (text_length / (text_length - z)) * math.log(text_length / z)
+        try:
+            estimated_vocabulary_size = (z / math.log(p_star * z)) * (text_length / (text_length - z)) * math.log(text_length / z)
+        except ZeroDivisionError:
+            warnings.warn("ZeroDivisionError for z = %f" % (z,))
+            z += 1
+            continue
+        # print("iteration: %d, estimated_vocabulary_size: %.4f, z: %.8f" % (i, estimated_vocabulary_size, z))
         if abs(vocabulary_size - estimated_vocabulary_size) <= min_tolerance:
             break
         if estimated_vocabulary_size < vocabulary_size:
             lower_z = z
             if upper_z is not None:
-                z = int((z + upper_z) / 2)
+                # z = int((z + upper_z) / 2)
+                z = (z + upper_z) / 2
             else:
                 z *= 2
         else:
             upper_z = z
             if lower_z is not None:
-                z = int((z + lower_z) / 2)
+                # z = int((z + lower_z) / 2)
+                z = (z + lower_z) / 2
             else:
-                z = int(z / 2)
+                # z = int(z / 2)
+                z = z / 2
     else:
         warnings.warn("Exceeded max_iterations")
     return z
