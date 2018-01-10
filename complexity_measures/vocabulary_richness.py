@@ -116,37 +116,30 @@ def hdd(text_length, frequency_spectrum, sample_size=42):
 # ---------------------------------- #
 
 def orlov_z(text_length, vocabulary_size, frequency_spectrum, max_iterations=100, min_tolerance=1):
-    """Orlov (1983)"""
+    """Orlov (1983)
+
+    Approximation via Newton's method.
+
+    """
+    def function(text_length, vocabulary_size, p_star, z):
+        return (z / math.log(p_star * z)) * (text_length / (text_length - z)) * math.log(text_length / z) - vocabulary_size
+
+    def derivative(text_length, vocabulary_size, p_star, z):
+        """Derivative obtained from WolframAlpha:
+        https://www.wolframalpha.com/input/?x=0&y=0&i=(x+%2F+(log(p+*+x)))+*+(n+%2F+(n+-+x))+*+log(n+%2F+x)+-+v
+
+        """
+        return (text_length * ((z - text_length) * math.log(p_star * z) + math.log(text_length / z) * (text_length * math.log(p_star * z) - text_length + z))) / (((text_length - z) ** 2) * (math.log(p_star * z) ** 2))
     most_frequent = max(frequency_spectrum.keys())
     p_star = most_frequent / text_length
-    lower_z, upper_z = None, None
-    z = int(text_length / 100)  # our initial guess
-    # print("text_length: %d, vocabulary_size: %d, p_star: %.4f, initial z: %d" % (text_length, vocabulary_size, p_star, z))
+    z = text_length / 2         # our initial guess
     for i in range(max_iterations):
-        try:
-            estimated_vocabulary_size = (z / math.log(p_star * z)) * (text_length / (text_length - z)) * math.log(text_length / z)
-        except ZeroDivisionError:
-            warnings.warn("ZeroDivisionError for z = %f" % (z,))
-            z += 1
-            continue
-        # print("iteration: %d, estimated_vocabulary_size: %.4f, z: %.8f" % (i, estimated_vocabulary_size, z))
-        if abs(vocabulary_size - estimated_vocabulary_size) <= min_tolerance:
+        # print(i, text_length, vocabulary_size, p_star, z)
+        next_z = z - (function(text_length, vocabulary_size, p_star, z) / derivative(text_length, vocabulary_size, p_star, z))
+        abs_diff = abs(z - next_z)
+        z = max(next_z, 0.001)
+        if abs_diff <= min_tolerance:
             break
-        if estimated_vocabulary_size < vocabulary_size:
-            lower_z = z
-            if upper_z is not None:
-                # z = int((z + upper_z) / 2)
-                z = (z + upper_z) / 2
-            else:
-                z *= 2
-        else:
-            upper_z = z
-            if lower_z is not None:
-                # z = int((z + lower_z) / 2)
-                z = (z + lower_z) / 2
-            else:
-                # z = int(z / 2)
-                z = z / 2
     else:
         warnings.warn("Exceeded max_iterations")
     return z
