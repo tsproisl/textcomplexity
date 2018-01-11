@@ -274,7 +274,8 @@ def bootstrap(tokens, measure='type_token_ratio', window_size=1000, ci=False, ra
     func = measures[measure]
     cls = measure_to_class[measure]
     for i in range(int(len(tokens) / window_size)):  # ignore last partial chunk
-        text_length, vocabulary_size, frequency_spectrum = preprocess(tokens[i * window_size:(i * window_size) + window_size], fs=True)
+        chunk = tokens[i * window_size:(i * window_size) + window_size]
+        text_length, vocabulary_size, frequency_spectrum = preprocess(chunk, fs=True)
         if cls == "tl_vs":
             result = func(text_length, vocabulary_size)
         elif cls == "vs_fs":
@@ -284,7 +285,7 @@ def bootstrap(tokens, measure='type_token_ratio', window_size=1000, ci=False, ra
         elif cls == "tl_fs":
             result = func(text_length, frequency_spectrum)
         elif cls == "t":
-            result = func(tokens)
+            result = func(chunk)
         results.append(result)
     if raw:
         return results
