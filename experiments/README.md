@@ -47,6 +47,6 @@ Observations hold true for all corpora, numbers are taken from the German Delta 
   * Group 3: Brunet's W, Carroll's CTTR, Dugast's U, Dugast's k, Guiraud's R, Herdan's C, Summer's S and Type-token ratio correlate perfectly
   * Group 2 and group 3 have a perfect negative correlation, i.e. all measures that use sample size and vocabulary size show perfect (negative) correlation
   * Entropy and Honoré's H correlate strongly with group 3 (ρ = 0.92 and 0.94) but less so with each other (ρ = 0.81)
-  * Michea's M and Sichel's have a perfect negative correlation and correlate strongly with Michea's M (ρ = ±0.92) and somewhat with group 2 or 3 (ρ = 0.82)
+  * Michea's M and Sichel's have a perfect negative correlation and correlate strongly with Honoré's H (ρ = ±0.92) and somewhat with group 2 or 3 (ρ = 0.82)
   * MTLD is its own group (all ρ < 0.8)
   * McCarthy and Jarvis' HD-D is its own group (all ρ < 0.8)
