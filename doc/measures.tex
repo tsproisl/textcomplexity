@@ -1,0 +1,62 @@
+\documentclass[11pt]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{natbib}
+\setcitestyle{authoryear,round,semicolon,aysep={,},yysep={,},notesep={:~}}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+
+\usepackage{xspace}
+
+\makeatletter
+% id est
+\newcommand{\ie}{i.\,e\@ifnextchar.{}{.\@\xspace}}
+% exempli gratia
+\newcommand{\eg}{e.\,g\@ifnextchar.{}{.\@\xspace}}
+% et cetera
+\newcommand{\etc}{etc\@ifnextchar.{}{.\@\xspace}}
+% confer
+\newcommand{\cf}{cf\@ifnextchar.{}{.\@\xspace}}
+% versus
+\newcommand{\vs}{vs\@ifnextchar.{}{.\@\xspace}}
+\makeatother
+
+\title{}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{description}
+\item[$N$:] Text length, \ie number of tokens
+\item[$V(N)$:] Vocabulary size, \ie number of types
+\item[$V(i, N)$:] Number of types occurring $i$ times
+\end{description}
+
+\section{Measures that use sample size and vocabulary size}
+
+\[\text{type-token ratio} = \frac{V(N)}{N}\]
+\[\text{Guiraud's } R = \frac{V(N)}{\sqrt{N}}\]
+\[\text{Herdan's } C = \frac{\log(V(N))}{\log(N)}\]
+\[\text{Dugast's } k = \frac{\log(V(N))}{\log(\log(N))}\]
+\[\text{Maas' } a^2 = \frac{\log(N) - \log(V(N))}{\log(N)^2}\]
+\[\text{Dugast's } U = \frac{\log(N)^2}{\log(N) - \log(V(N))}\]
+\[\text{Tuldava's } \textit{LN} = \frac{1 - V(N)^2}{V(N)^2\log(N)}\]
+\[\text{Brunet's } W = N^{V(N)^{-a}} \text{ with } a = -0.172\]
+\[\text{Carroll's } \textit{CTTR} = \frac{V(N)}{\sqrt{2 N}}\]
+\[\text{Summer's } S = \frac{\log(\log(V(N)))}{\log(\log(N))}\]
+
+\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
