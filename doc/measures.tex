@@ -53,6 +53,22 @@
 \[\text{Carroll's } \textit{CTTR} = \frac{V(N)}{\sqrt{2 N}}\]
 \[\text{Summer's } S = \frac{\log(\log(V(N)))}{\log(\log(N))}\]
 
+\section{Measures that use part of the frequency spectrum}
+
+\[\text{Honoré's } H = 100 \frac{\log(N)}{1 - \frac{V(1, N)}{V(N)}}\]
+\[\text{Sichel's } S = \frac{V(2, N)}{V(N)}\]
+\[\text{Michéa's } M = \frac{V(N)}{V(2, N)}\]
+
+\section{Measures that use the whole frequency spectrum}
+
+\[\text{Entropy} = \sum_{i=1}^N V(i, N)\left(-\log(\frac{i}{N})\right)\frac{i}{N}\]
+\[\text{Yule's } K = 10^4 \left(-\frac{1}{N} + \sum_{i=1}^N V(i, N) \left( \frac{i}{N}\right)^2 \right)\]
+\[\text{Simpson's } D = \sum_{i=1}^{V(N)} V(i, N) \frac{i}{N} \frac{i - 1}{N - 1}\]
+\[\text{Herdan's } V_m = \sqrt{-\frac{1}{V(N)} + \sum_{i=1}^{V(N)} V(i, N) \left(\frac{i}{N}\right)^2}\]
+\[\text{McCarthy and Jarvis' } \textit{HD-D} = \sum_{i=1}^{V(N)} \frac{1}{42} \left(1 - \frac{\binom{i}{0} \binom{N - V(i, N)}{42 - 0}}{\binom{N}{42}}\right) = \sum_{i=1}^{V(N)} \frac{1}{42} \left(1 - \frac{\binom{N - V(i, N)}{42}}{\binom{N}{42}}\right)\]
+
+% sum(((1 - scipy.stats.hypergeom.pmf(0, text_length, freq, sample_size)) / sample_size for word, freq in frequency_spectrum.items()))
+
 \end{document}
 
 
