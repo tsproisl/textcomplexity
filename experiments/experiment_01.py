@@ -110,11 +110,11 @@ def create_tsv_file(filename, tokens, id_to_metadata, measures, window_sizes):
                     per_ws_results.append(local_results)
                 for per_fold_results in zip(*per_ws_results):
                     f.write("\t".join((str(fold_counter), str(window_size), file_id, author, title, str(year))))
-                    f.write("\t")                    
+                    f.write("\t")
                     f.write("\t".join((str(_) for _ in per_fold_results)))
                     f.write("\n")
                     fold_counter += 1
-    
+
 
 def main():
     # measures = ["type_token_ratio", "guiraud_r", "herdan_c",
@@ -145,27 +145,27 @@ def main():
     # Delta DE
     tokens, id_to_metadata = read_directory_tagged_stemmed_lemmatized("/home/ccl/spthproi/Documents/Arbeit/kallimachos/authorship/data/corpus_DE_tagged_stemmed_lemmatized")
     create_tsv_file("experiment_01.d/results_delta_de.tsv", tokens, id_to_metadata, measures, window_sizes)
-    
+
     # Delta DE without punctuation
     tokens, id_to_metadata = read_directory_tagged_stemmed_lemmatized("/home/ccl/spthproi/Documents/Arbeit/kallimachos/authorship/data/corpus_DE_tagged_stemmed_lemmatized", filter_punctuation=True)
     create_tsv_file("experiment_01.d/results_delta_de_no_punctuation.tsv", tokens, id_to_metadata, measures, window_sizes)
-    
+
     # Delta EN
     tokens, id_to_metadata = read_directory_tagged_stemmed_lemmatized("/home/ccl/spthproi/Documents/Arbeit/kallimachos/authorship/data/corpus_EN_tagged_stemmed_lemmatized")
     create_tsv_file("experiment_01.d/results_delta_en.tsv", tokens, id_to_metadata, measures, window_sizes)
-    
+
     # Delta EN without punctuation
     tokens, id_to_metadata = read_directory_tagged_stemmed_lemmatized("/home/ccl/spthproi/Documents/Arbeit/kallimachos/authorship/data/corpus_EN_tagged_stemmed_lemmatized", filter_punctuation=True)
     create_tsv_file("experiment_01.d/results_delta_en_no_punctuation.tsv", tokens, id_to_metadata, measures, window_sizes)
-    
+
     # Delta FR
     tokens, id_to_metadata = read_directory_tagged_stemmed_lemmatized("/home/ccl/spthproi/Documents/Arbeit/kallimachos/authorship/data/corpus_FR_tagged_stemmed_lemmatized")
     create_tsv_file("experiment_01.d/results_delta_fr.tsv", tokens, id_to_metadata, measures, window_sizes)
-    
+
     # Delta FR without punctuation
     tokens, id_to_metadata = read_directory_tagged_stemmed_lemmatized("/home/ccl/spthproi/Documents/Arbeit/kallimachos/authorship/data/corpus_FR_tagged_stemmed_lemmatized", filter_punctuation=True)
     create_tsv_file("experiment_01.d/results_delta_fr_no_punctuation.tsv", tokens, id_to_metadata, measures, window_sizes)
-    
+
     # results = {m: {w: {} for w in window_sizes} for m in measures}
     # # results["mattr"] = {w: None for w in window_sizes}
     # for measure in measures:
