@@ -4,11 +4,9 @@ import statistics
 
 import networkx
 
-from complexity_measures import utils
-
 
 def average_sentence_length(sentence_graphs):
-    """Oya (2011)"""
+    """"""
     lengths = []
     for g in sentence_graphs:
         lengths.append(len(g))
