@@ -154,7 +154,7 @@ def average_punctuation_per_sentence(sentence_graphs):
 
 def punctuation_per_sentence(g):
     punctuation = set(["$.", "$,", "$("])
-    return len([v for v, l in g.nodes(data=True) if l["POS"] in punctuation])
+    return len([v for v, l in g.nodes(data=True) if l["pos"] in punctuation])
 
 
 def average_punctuation_per_token(sentence_graphs):
