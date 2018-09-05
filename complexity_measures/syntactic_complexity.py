@@ -146,3 +146,20 @@ def dependents_per_word(g):
     """Average number of dependents per word."""
     outdegrees = [deg for v, deg in g.out_degree()]
     return statistics.mean(outdegrees)
+
+
+def average_punctuation_per_sentence(sentence_graphs):
+    return _average_statistic(punctuation_per_sentence, sentence_graphs)
+
+
+def punctuation_per_sentence(g):
+    punctuation = set(["$.", "$,", "$("])
+    return len([v for v, l in g.nodes(data=True) if l["POS"] in punctuation])
+
+
+def average_punctuation_per_token(sentence_graphs):
+    punct, tokens = 0, 0
+    for g in sentence_graphs:
+        tokens += len(g)
+        punct += punctuation_per_sentence(g)
+    return punct / tokens
