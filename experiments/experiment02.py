@@ -44,7 +44,7 @@ def main():
         longest_shortest_path.append(lsp)
         longest_shortest_path_stdev.append(lsp_stdev)
         punctuation_per_sentence.append(pps)
-        punctuation_per_sentence_stdev(pps_stdev)
+        punctuation_per_sentence_stdev.append(pps_stdev)
         punctuation_per_token.append(ppt)
     metadata["dependency_distance"] = dependency_distance
     metadata["dependency_distance_stdev"] = dependency_distance_stdev
