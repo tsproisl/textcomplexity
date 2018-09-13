@@ -3,7 +3,9 @@
 This project is a collection of measures that assess the linguistic
 and stylistic complexity of (literary) texts.
 
-## Measures that use sample size and vocabulary size ##
+## Vocabulary-based complexity measures ##
+
+### Measures that use sample size and vocabulary size ###
 
   * Type-token ratio
   * Guiraud's R
@@ -16,13 +18,13 @@ and stylistic complexity of (literary) texts.
   * Carroll's CTTR
   * Summer's S
 
-## Measures that use part of the frequency spectrum ##
+### Measures that use part of the frequency spectrum ###
 
   * Honoré's H
   * Sichel's S
   * Michéa's M
 
-## Measures that use the whole frequency spectrum ##
+### Measures that use the whole frequency spectrum ###
 
   * Entropy
   * Yule's K
@@ -30,15 +32,27 @@ and stylistic complexity of (literary) texts.
   * Herdan's V<sub>m</sub>
   * McCarthy and Jarvis' HD-D
 
-## Parameters of probabilistic models ##
+### Parameters of probabilistic models ###
 
   * Orlov's Z
 
-## Measures that use the whole text ##
+### Measures that use the whole text ###
 
   * Covington and McFall's MATTR
   * MTLD
   * Kubat and Milicka's STTR
+
+## Syntactic complexity measures ##
+
+  * Average sentence length
+  * Average dependency distance
+  * Average closeness centrality
+  * Average outdegree centralization
+  * Average closeness centralization
+  * Average longest shortest path
+  * Average dependents per token
+  * Average punctuation per sentence
+  * Average punctuation per token
 
 ## Links ##
 
