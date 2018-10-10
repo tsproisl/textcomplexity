@@ -103,7 +103,7 @@ def read_txt_csv_graphs(f):
                 g.add_edge(gov, tid, relation=rel)
             tree_frag.replace("*", "(%s %s)" % (token[9], token[6]))
             tree.append(tree_frag)
-            tree = "".join(tree)
+        tree = "".join(tree)
         sensible, explanation = is_sensible_graph(g)
         if sensible:
             yield g, tree
