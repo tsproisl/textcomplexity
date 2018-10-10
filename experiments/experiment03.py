@@ -13,23 +13,27 @@ def main():
         genre = text["genre"]
         if text["brow"] == "high":
             genre = "high"
-        with open("/ccl/projects/Kallimachos/low_high_brow_corpus/all_by_id/%s.jtf" % text["ID"]) as f:
-            sentence_graphs = list(utils.read_jtf_graphs(f))
-        for sentence in sentence_graphs:
-            sentence_id = sentence.graph["sentence_id"]
-            dd = syntactic_complexity.dependency_distances(sentence)
+        # with open("/ccl/projects/Kallimachos/low_high_brow_corpus/all_by_id/%s.jtf" % text["ID"]) as f:
+        #     sentences = list(utils.read_jtf_graphs(f))
+        with open("/ccl/projects/Kallimachos/low_high_brow_corpus_v2/all_by_id/%s.txt.csv" % text["ID"]) as f:
+            sentences = list(utils.read_txt_csv_graphs(f))
+        # for g in sentences:
+        for g, tree in sentences:
+            print(tree)
+            sentence_id = g.graph["sentence_id"]
+            dd = syntactic_complexity.dependency_distances(g)
             if len(dd) > 0:
                 dd = ",".join(map(str, dd))
             else:
                 dd = 0
-            add = syntactic_complexity.average_dependency_distance(sentence)
-            length = syntactic_complexity.sentence_length(sentence)
-            cc = syntactic_complexity.closeness_centrality(sentence)
-            odc = syntactic_complexity.outdegree_centralization(sentence)
-            ccentr = syntactic_complexity.closeness_centralization(sentence)
-            lsp = syntactic_complexity.longest_shortest_path(sentence)
-            dpw = syntactic_complexity.dependents_per_word(sentence)
-            pps = syntactic_complexity.punctuation_per_sentence(sentence)
+            add = syntactic_complexity.average_dependency_distance(g)
+            length = syntactic_complexity.sentence_length(g)
+            cc = syntactic_complexity.closeness_centrality(g)
+            odc = syntactic_complexity.outdegree_centralization(g)
+            ccentr = syntactic_complexity.closeness_centralization(g)
+            lsp = syntactic_complexity.longest_shortest_path(g)
+            dpw = syntactic_complexity.dependents_per_word(g)
+            pps = syntactic_complexity.punctuation_per_sentence(g)
             print("\t".join(map(str, (text["ID"], genre, text["brow"], sentence_id, add, cc, odc, ccentr, length, dpw, lsp, pps, dd))))
 
 
