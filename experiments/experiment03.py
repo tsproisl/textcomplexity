@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import logging
+
 import pandas as pd
 
 from complexity_measures import syntactic_complexity
@@ -15,8 +17,11 @@ def main():
             genre = "high"
         # with open("/ccl/projects/Kallimachos/low_high_brow_corpus/all_by_id/%s.jtf" % text["ID"]) as f:
         #     sentences = list(utils.read_jtf_graphs(f))
-        with open("/ccl/projects/Kallimachos/low_high_brow_corpus_v2/all_by_id/%s.txt.csv" % text["ID"]) as f:
-            sentences = list(utils.read_txt_csv_graphs(f))
+        try:
+            with open("/ccl/projects/Kallimachos/low_high_brow_corpus_v2/all_by_id/%s.txt.csv" % text["ID"]) as f:
+                sentences = list(utils.read_txt_csv_graphs(f))
+        except FileNotFoundError:
+            logging.warn("File not found: %s.txt.csv" % text["ID"])
         # for g in sentences:
         for g, tree in sentences:
             print(tree)
