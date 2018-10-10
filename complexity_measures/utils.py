@@ -93,11 +93,11 @@ def read_txt_csv_graphs(f):
         g.add_nodes_from([attributes(t) for t in sentence])
         tree = []
         for token in sentence:
-            tid = token[3]
-            gov = token[13]
+            tid = int(token[3])
+            gov = int(token[13])
             rel = token[14]
             tree_frag = token[18]
-            if gov == "-1":
+            if gov == -1:
                 g.node[tid]["root"] = "root"
             else:
                 g.add_edge(gov, tid, relation=rel)
