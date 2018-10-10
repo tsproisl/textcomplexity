@@ -22,6 +22,7 @@ def main():
                 sentences = list(utils.read_txt_csv_graphs(f))
         except FileNotFoundError:
             logging.warn("File not found: %s.txt.csv" % text["ID"])
+            continue
         # for g in sentences:
         for g, tree in sentences:
             print(tree)
