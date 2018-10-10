@@ -86,7 +86,7 @@ def read_txt_csv_graphs(f):
     """
     def attributes(t):
         return int(t[3]), {"token": t[6], "lemma": t[7], "cpos": t[8], "pos": t[9], "morphology": t[11]}
-    sentences = read_jtf_sentences(f)
+    sentences = read_txt_csv_sentences(f)
     for sentence in sentences:
         sentence_id = sentence[0][2]
         g = networkx.DiGraph(sentence_id=sentence_id)
