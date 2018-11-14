@@ -14,6 +14,9 @@ def _average_statistic(statistic, sentence_graphs):
     return statistics.mean(results), statistics.stdev(results)
 
 
+# -----------------
+#  Sentence length
+# -----------------
 def average_sentence_length(sentence_graphs):
     """"""
     return _average_statistic(sentence_length, sentence_graphs)
@@ -24,6 +27,9 @@ def sentence_length(g):
     return len(g)
 
 
+# ---------------------
+#  Dependency distance
+# ---------------------
 def average_average_dependency_distance(sentence_graphs):
     """Oya (2011)"""
     return _average_statistic(average_dependency_distance, sentence_graphs)
@@ -46,6 +52,9 @@ def dependency_distances(g):
     return distances
 
 
+# ----------------------
+#  Closeness centrality
+# ----------------------
 def average_closeness_centrality(sentence_graphs):
     """Closeness centrality of the root vertex, i.e. the inverse of the
     average length of the shortest paths from the root to all other
@@ -68,6 +77,9 @@ def closeness_centrality(g):
         return 1
 
 
+# --------------------------
+#  Outdegree centralization
+# --------------------------
 def average_outdegree_centralization(sentence_graphs):
     """Outdegree centralization of the graph (Freeman, 1978). Return
     values range between 0 and 1. 1 means all other vertices are
@@ -95,6 +107,9 @@ def outdegree_centralization(g):
         return 1
 
 
+# --------------------------
+#  Closeness centralization
+# --------------------------
 def average_closeness_centralization(sentence_graphs):
     """Closeness centralization of the graph (Freeman, 1978). Return
     values range between 0 and 1. 1 means all other vertices are
@@ -122,6 +137,9 @@ def closeness_centralization(g):
         return 1
 
 
+# -----------------------
+#  Longest shortest path
+# -----------------------
 def average_longest_shortest_path(sentence_graphs):
     return _average_statistic(longest_shortest_path, sentence_graphs)
 
@@ -138,6 +156,9 @@ def longest_shortest_path(g):
         return 0
 
 
+# ---------------------
+#  Dependents per word
+# ---------------------
 def average_dependents_per_word(sentence_graphs):
     return _average_statistic(dependents_per_word, sentence_graphs)
 
@@ -148,6 +169,9 @@ def dependents_per_word(g):
     return statistics.mean(outdegrees)
 
 
+# -------------
+#  Punctuation
+# -------------
 def average_punctuation_per_sentence(sentence_graphs):
     return _average_statistic(punctuation_per_sentence, sentence_graphs)
 
