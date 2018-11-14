@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
-from nltk.tree import ParentedTree
+import itertools
+import statistics
+
 import nltk_tgrep
+
 
 # Average number of CONSTITUENTs per sentence (NP, VP, PP, SBAR)
 
@@ -13,18 +16,61 @@ import nltk_tgrep
 
 # Lu 2010
 
-# clauses = S
-# 
 
+def t_units(tree):
+    """A t-unit is “one main clause plus any subordinate clause or
+    nonclausal structure that is attached to or embedded in it” (Hunt
+    1970: 4).
 
-examples = ["(TOP(CS(S(KON Und)(ADV dann)(VVFIN kam)(ADJD unvermittelt)(NP(ART der)(NN Moment)))($, ,)(S(S(KOUS da)(PPER sie)(VP(PIS beide)(VVINF auflegen))(VMFIN mussten))($, ,)(PP(APPR aus)(PIAT irgendeinem)(NN Grund)))($, ,)(KON und)(S(NP(ART die)(NN Frau))(VVFIN begann)(NP(PPOSAT ihr)(NN Gepäck)(PP(APPRART im)(NN Abteil)))(VZ(PTKZU zu)(VVINF verstauen)))($. .)))",
-            "(TOP(S(NP(ART Die)(NN Leute))(VMFIN mussten)(PPER ihm)(VP(VVINF ausweichen)($, ,)(PP(APPR mit)(CNP(NP(PPOSAT ihren)(CNP(NN Koffern)(KON und)(NN Kindern)))(KON und)(PIS allem)))($, ,)(S(PRELS was)(PIS man)(ADV sonst)(ADV noch)(VP(PP(APPRART im)(NN Leben))(PP(APPR hinter)(PRF sich))(VVINF herziehen))(VMFIN musste)))($. .)))",
-            "(TOP(S(NP(PPOSAT Sein)(NN Koffer))(VVFIN lehnte)(PRF sich)(PP(APPR an)(PPOSAT sein)(ADJA linkes)(NN Bein))($. .)))"]
-for example in examples:
-    tree = ParentedTree.fromstring(example)
-    print(tree)
-    # t-units: TOP-S, TOP-CS-S
+    We operationalize it as an S node that is immediately dominated
+    either by TOP or by a CS node that is immediately dominated by
+    TOP. S = sentence, CS = coordinated sentence.
+
+    """
     result = nltk_tgrep.tgrep_nodes(tree, "S > (CS > TOP) | > TOP")
-    print(len(result))
-    for res in result:
-        print(res)
+    lengths = [r.leaves() for r in result]
+    return len(result), lengths
+
+
+def clauses(tree):
+    """A clause is defined as a structure with a subject and a finite verb
+    (Hunt 1965, Polio 1997).
+
+    We operationalize it as an S node, since that is defined as “a
+    finite verb + its dependents”.
+    (http://www.coli.uni-saarland.de/projects/sfb378/negra-corpus/knoten.html#S).
+
+    """
+    return _single_constituent(tree, "S")
+
+
+def nps(tree):
+    """Number and lengths of NPs."""
+    return _single_constituent(tree, "NP")
+
+
+def vps(tree):
+    """Number and lengths of VPs."""
+    return _single_constituent(tree, "VP")
+
+
+def pps(tree):
+    """Number and lengths of PPs."""
+    return _single_constituent(tree, "PP")
+
+
+def constituents(tree):
+    """Number of constituents."""
+    return len(list(tree.subtrees()))
+
+
+def constituents_wo_leaves(tree):
+    """Number of constituents (not counting leaves)."""
+    return len(list(tree.subtrees())) - len(tree.leaves())
+
+
+def _single_constituent(tree, constituent):
+    """Number and lenghts of constituent"""
+    result = nltk_tgrep.tgrep_nodes(tree, constituent)
+    lengths = [r.leaves() for r in result]
+    return len(result), lengths

@@ -4,6 +4,7 @@ import collections
 import logging
 
 import networkx
+from nltk.tree import ParentedTree
 
 
 def read_jtf_sentences(f):
@@ -80,8 +81,8 @@ def read_txt_csv_sentences(f):
 
 def read_txt_csv_graphs(f):
     """Read a file in txt.csv format, i.e. a tab-separated file with 21
-    columns, convert the sentences to networkx graphs and reconstruct
-    the phrase structure tree.
+    columns, convert the dependency parses to networkx graphs and the
+    phrase structure trees to NLTK ParentedTrees.
 
     """
     def attributes(t):
@@ -106,6 +107,7 @@ def read_txt_csv_graphs(f):
         tree = "".join(tree)
         sensible, explanation = is_sensible_graph(g)
         if sensible:
+            tree = ParentedTree.fromstring(tree)
             yield g, tree
         else:
             logging.warn("%s. Ignoring sentence with ID %s." % (explanation, sentence_id))
