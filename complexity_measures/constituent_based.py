@@ -1,20 +1,6 @@
 #!/usr/bin/env python3
 
-import itertools
-import statistics
-
 import nltk_tgrep
-
-
-# Average number of CONSTITUENTs per sentence (NP, VP, PP, SBAR)
-
-# Average length of CONSTITUENT (NP, VP, PP)
-
-# Average number of constituents per sentence
-
-# NUR = FRAG?
-
-# Lu 2010
 
 
 def t_units(tree):
@@ -27,9 +13,17 @@ def t_units(tree):
     TOP. S = sentence, CS = coordinated sentence.
 
     """
-    result = nltk_tgrep.tgrep_nodes(tree, "S > (CS > TOP) | > TOP")
-    lengths = [r.leaves() for r in result]
-    return len(result), lengths
+    return _tgrep_count_and_lengths(tree, "S > (CS > TOP) | > TOP")
+
+
+def complex_t_units(tree):
+    """A complex T-unit is one that contains a dependent clause (Casanave
+    1994).
+
+    We operationalize it as a t-unit that dominates an S node.
+
+    """
+    return _tgrep_count_and_lengths(tree, "(S > (CS > TOP) | > TOP) << S")
 
 
 def clauses(tree):
@@ -41,22 +35,35 @@ def clauses(tree):
     (http://www.coli.uni-saarland.de/projects/sfb378/negra-corpus/knoten.html#S).
 
     """
-    return _single_constituent(tree, "S")
+    return _tgrep_count_and_lengths(tree, "S")
+
+
+def dependent_clauses(tree):
+    """A clause that is immediately dominated by another clause."""
+    return _tgrep_count_and_lengths(tree, "S > S")
 
 
 def nps(tree):
     """Number and lengths of NPs."""
-    return _single_constituent(tree, "NP")
+    return _tgrep_count_and_lengths(tree, "NP")
 
 
 def vps(tree):
     """Number and lengths of VPs."""
-    return _single_constituent(tree, "VP")
+    return _tgrep_count_and_lengths(tree, "VP")
 
 
 def pps(tree):
     """Number and lengths of PPs."""
-    return _single_constituent(tree, "PP")
+    return _tgrep_count_and_lengths(tree, "PP")
+
+
+def coordinate_phrases(tree):
+    """Only adjective, adverb, noun, and verb phrases are counted in
+    coordinate phrases (Cooper 1976).
+
+    """
+    return _tgrep_count_and_lengths(tree, "CAP|CAVP|CNP|CVP")
 
 
 def constituents(tree):
@@ -69,8 +76,13 @@ def constituents_wo_leaves(tree):
     return len(list(tree.subtrees())) - len(tree.leaves())
 
 
-def _single_constituent(tree, constituent):
+def height(tree):
+    """Height of the parse tree."""
+    return tree.height()
+
+
+def _tgrep_count_and_lengths(tree, pattern):
     """Number and lenghts of constituent"""
-    result = nltk_tgrep.tgrep_nodes(tree, constituent)
+    result = nltk_tgrep.tgrep_nodes(tree, pattern)
     lengths = [r.leaves() for r in result]
     return len(result), lengths
