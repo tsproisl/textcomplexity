@@ -107,8 +107,12 @@ def read_txt_csv_graphs(f):
         tree = "".join(tree)
         sensible, explanation = is_sensible_graph(g)
         if sensible:
-            tree = ParentedTree.fromstring(tree)
-            yield g, tree
+            try:
+                tree = ParentedTree.fromstring(tree)
+            except ValueError:
+                logging.warn("Failed to construct parse tree. Ignoring sentence with ID %s." % sentence_id)
+            else:
+                yield g, tree
         else:
             logging.warn("%s. Ignoring sentence with ID %s." % (explanation, sentence_id))
 
