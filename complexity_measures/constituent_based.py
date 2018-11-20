@@ -17,6 +17,26 @@ import nltk_tgrep
 # Lu 2010
 
 
+def _average_statistic_with_lengths(statistic, trees):
+    """Calculate the statistic for every sentence and return mean and
+    standard deviation."""
+    results = [statistic(t) for t in trees]
+    counts, lengths = zip(*results)
+    lengths = list(itertools.chain.from_iterable(lengths))
+    return statistics.mean(counts), statistics.stdev(counts), statistics.mean(lengths), statistics.stdev(lengths)
+
+
+def _average_statistic_wo_lengths(statistic, trees):
+    """Calculate the statistic for every sentence and return mean and
+    standard deviation."""
+    results = [statistic(t) for t in trees]
+    return statistics.mean(results), statistics.stdev(results)
+
+
+def average_t_units(trees):
+    return _average_statistic_with_lengths(t_units, trees)
+
+
 def t_units(tree):
     """A t-unit is “one main clause plus any subordinate clause or
     nonclausal structure that is attached to or embedded in it” (Hunt
@@ -27,9 +47,11 @@ def t_units(tree):
     TOP. S = sentence, CS = coordinated sentence.
 
     """
-    result = nltk_tgrep.tgrep_nodes(tree, "S > (CS > TOP) | > TOP")
-    lengths = [r.leaves() for r in result]
-    return len(result), lengths
+    return _single_constituent(tree, "S > (CS > TOP) | > TOP")
+
+
+def average_clauses(trees):
+    return _average_statistic_with_lengths(clauses, trees)
 
 
 def clauses(tree):
@@ -44,9 +66,17 @@ def clauses(tree):
     return _single_constituent(tree, "S")
 
 
+def average_nps(trees):
+    return _average_statistic_with_lengths(nps, trees)
+
+
 def nps(tree):
     """Number and lengths of NPs."""
     return _single_constituent(tree, "NP")
+
+
+def average_vps(trees):
+    return _average_statistic_with_lengths(vps, trees)
 
 
 def vps(tree):
@@ -54,14 +84,26 @@ def vps(tree):
     return _single_constituent(tree, "VP")
 
 
+def average_pps(trees):
+    return _average_statistic_with_lengths(pps, trees)
+
+
 def pps(tree):
     """Number and lengths of PPs."""
     return _single_constituent(tree, "PP")
 
 
+def average_constituents(trees):
+    return _average_statistic_wo_lengths(constituents, trees)
+
+
 def constituents(tree):
     """Number of constituents."""
     return len(list(tree.subtrees()))
+
+
+def average_constituents_wo_leaves(trees):
+    return _average_statistic_wo_lengths(constituents_wo_leaves, trees)
 
 
 def constituents_wo_leaves(tree):
@@ -72,5 +114,5 @@ def constituents_wo_leaves(tree):
 def _single_constituent(tree, constituent):
     """Number and lenghts of constituent"""
     result = nltk_tgrep.tgrep_nodes(tree, constituent)
-    lengths = [r.leaves() for r in result]
+    lengths = [len(r.leaves()) for r in result]
     return len(result), lengths
