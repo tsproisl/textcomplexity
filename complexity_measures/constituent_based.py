@@ -3,18 +3,8 @@
 import itertools
 import statistics
 
+import nltk
 import nltk_tgrep
-
-
-# Average number of CONSTITUENTs per sentence (NP, VP, PP, SBAR)
-
-# Average length of CONSTITUENT (NP, VP, PP)
-
-# Average number of constituents per sentence
-
-# NUR = FRAG?
-
-# Lu 2010
 
 
 def _average_statistic_with_lengths(statistic, trees):
@@ -111,8 +101,18 @@ def constituents_wo_leaves(tree):
     return len(list(tree.subtrees())) - len(tree.leaves())
 
 
+def average_height(trees):
+    return _average_statistic_wo_lengths(height, trees)
+
+
+def height(tree):
+    """Height of the parse tree."""
+    return tree.height()
+
+
 def _single_constituent(tree, constituent):
     """Number and lenghts of constituent"""
     result = nltk_tgrep.tgrep_nodes(tree, constituent)
+    result = [r for r in result if isinstance(r, nltk.tree.ParentedTree)]
     lengths = [len(r.leaves()) for r in result]
     return len(result), lengths
