@@ -50,3 +50,17 @@ Observations hold true for all corpora, numbers are taken from the German Delta 
   * Michea's M and Sichel's have a perfect negative correlation and correlate strongly with Honoré's H (ρ = ±0.92) and somewhat with group 2 or 3 (ρ = 0.82)
   * MTLD is its own group (all ρ < 0.8); most similar to entropy (ρ = 0.78)
   * McCarthy and Jarvis' HD-D is its own group (all ρ < 0.8)
+
+## Experiment 2 ##
+
+Dependency-based measures of syntactic complexity and their
+correlations.
+
+## Experiment 3 ##
+
+Sentence-level distributions of dependency-based measures of syntactic
+complexity.
+
+## Experiment 4 ##
+
+Distributions of (classes of) part-of-speech tags.

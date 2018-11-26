@@ -37,7 +37,21 @@ def t_units(tree):
     TOP. S = sentence, CS = coordinated sentence.
 
     """
-    return _single_constituent(tree, "S > (CS > TOP) | > TOP")
+    return _tgrep_count_and_lengths(tree, "S > (CS > TOP) | > TOP")
+
+
+def average_complex_t_units(trees):
+    return _average_statistic_with_lengths(complex_t_units, trees)
+
+
+def complex_t_units(tree):
+    """A complex T-unit is one that contains a dependent clause (Casanave
+    1994).
+
+    We operationalize it as a t-unit that dominates an S node.
+
+    """
+    return _tgrep_count_and_lengths(tree, "(S > (CS > TOP) | > TOP) << S")
 
 
 def average_clauses(trees):
@@ -53,7 +67,16 @@ def clauses(tree):
     (http://www.coli.uni-saarland.de/projects/sfb378/negra-corpus/knoten.html#S).
 
     """
-    return _single_constituent(tree, "S")
+    return _tgrep_count_and_lengths(tree, "S")
+
+
+def average_dependent_clauses(trees):
+    return _average_statistic_with_lengths(dependent_clauses, trees)
+
+
+def dependent_clauses(tree):
+    """A clause that is immediately dominated by another clause."""
+    return _tgrep_count_and_lengths(tree, "S > S")
 
 
 def average_nps(trees):
@@ -62,7 +85,7 @@ def average_nps(trees):
 
 def nps(tree):
     """Number and lengths of NPs."""
-    return _single_constituent(tree, "NP")
+    return _tgrep_count_and_lengths(tree, "NP")
 
 
 def average_vps(trees):
@@ -71,7 +94,7 @@ def average_vps(trees):
 
 def vps(tree):
     """Number and lengths of VPs."""
-    return _single_constituent(tree, "VP")
+    return _tgrep_count_and_lengths(tree, "VP")
 
 
 def average_pps(trees):
@@ -80,7 +103,19 @@ def average_pps(trees):
 
 def pps(tree):
     """Number and lengths of PPs."""
-    return _single_constituent(tree, "PP")
+    return _tgrep_count_and_lengths(tree, "PP")
+
+
+def average_coordinate_phrases(trees):
+    return _average_statistic_with_lengths(coordinate_phrases, trees)
+
+
+def coordinate_phrases(tree):
+    """Only adjective, adverb, noun, and verb phrases are counted in
+    coordinate phrases (Cooper 1976).
+
+    """
+    return _tgrep_count_and_lengths(tree, "CAP|CAVP|CNP|CVP")
 
 
 def average_constituents(trees):
@@ -110,9 +145,9 @@ def height(tree):
     return tree.height()
 
 
-def _single_constituent(tree, constituent):
+def _tgrep_count_and_lengths(tree, pattern):
     """Number and lenghts of constituent"""
-    result = nltk_tgrep.tgrep_nodes(tree, constituent)
+    result = nltk_tgrep.tgrep_nodes(tree, pattern)
     result = [r for r in result if isinstance(r, nltk.tree.ParentedTree)]
     lengths = [len(r.leaves()) for r in result]
     return len(result), lengths
