@@ -45,16 +45,31 @@ and stylistic complexity of (literary) texts.
 ## Syntactic complexity measures ##
 
   * Average sentence length
+  * Average punctuation per sentence
+  * Average punctuation per token
+
+### Dependency-based measures
+
   * Average dependency distance
   * Average closeness centrality
   * Average outdegree centralization
   * Average closeness centralization
   * Average longest shortest path
   * Average dependents per token
-  * Average punctuation per sentence
-  * Average punctuation per token
 
-## Links ##
+### Constituent-based measures
 
-  * Implementation of various measures in R: <http://reaktanz.de/?c=hacking&s=koRpus>
+Language-independent measures:
+  * Average number of constituents
+  * Average number of constituents without leaves
+  * Average height of the parse trees
 
+Language-dependent measures (defined for German):
+  * Average number of t units
+  * Average number of complex t units
+  * Average number of clauses
+  * Average number of dependent clauses
+  * Average number of NPs
+  * Average number of VPs
+  * Average number of PPs
+  * Average number of coordinate phrases
