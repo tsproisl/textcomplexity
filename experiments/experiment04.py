@@ -4,7 +4,6 @@ import collections
 
 import pandas as pd
 
-from complexity_measures import syntactic_complexity
 from complexity_measures import utils
 
 

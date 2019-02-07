@@ -4,7 +4,7 @@ import logging
 
 import pandas as pd
 
-from complexity_measures import syntactic_complexity
+from complexity_measures import dependency_based
 from complexity_measures import utils
 
 
@@ -25,21 +25,21 @@ def main():
             continue
         # for g in sentences:
         for g, tree in sentences:
-            print(tree)
+            # print(tree)
             sentence_id = g.graph["sentence_id"]
-            dd = syntactic_complexity.dependency_distances(g)
+            dd = dependency_based.dependency_distances(g)
             if len(dd) > 0:
                 dd = ",".join(map(str, dd))
             else:
                 dd = 0
-            add = syntactic_complexity.average_dependency_distance(g)
-            length = syntactic_complexity.sentence_length(g)
-            cc = syntactic_complexity.closeness_centrality(g)
-            odc = syntactic_complexity.outdegree_centralization(g)
-            ccentr = syntactic_complexity.closeness_centralization(g)
-            lsp = syntactic_complexity.longest_shortest_path(g)
-            dpw = syntactic_complexity.dependents_per_word(g)
-            pps = syntactic_complexity.punctuation_per_sentence(g)
+            add = dependency_based.average_dependency_distance(g)
+            length = dependency_based.sentence_length(g)
+            cc = dependency_based.closeness_centrality(g)
+            odc = dependency_based.outdegree_centralization(g)
+            ccentr = dependency_based.closeness_centralization(g)
+            lsp = dependency_based.longest_shortest_path(g)
+            dpw = dependency_based.dependents_per_word(g)
+            pps = dependency_based.punctuation_per_sentence(g)
             print("\t".join(map(str, (text["ID"], genre, text["brow"], sentence_id, add, cc, odc, ccentr, length, dpw, lsp, pps, dd))))
 
 

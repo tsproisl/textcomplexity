@@ -2,21 +2,21 @@
 
 import pandas as pd
 
-from complexity_measures import syntactic_complexity
+from complexity_measures import dependency_based
 from complexity_measures import constituent_based
 from complexity_measures import utils
 
 
 def main():
     metadata = pd.read_csv("/ccl/projects/Kallimachos/low_high_brow_corpus_v2/metadata.tsv", sep="\t", header=0, index_col=0)
-    dep_based = [syntactic_complexity.average_average_dependency_distance,
-                 syntactic_complexity.average_closeness_centrality,
-                 syntactic_complexity.average_outdegree_centralization,
-                 syntactic_complexity.average_closeness_centralization,
-                 syntactic_complexity.average_sentence_length,
-                 syntactic_complexity.average_dependents_per_word,
-                 syntactic_complexity.average_longest_shortest_path,
-                 syntactic_complexity.average_punctuation_per_sentence]
+    dep_based = [dependency_based.average_average_dependency_distance,
+                 dependency_based.average_closeness_centrality,
+                 dependency_based.average_outdegree_centralization,
+                 dependency_based.average_closeness_centralization,
+                 dependency_based.average_sentence_length,
+                 dependency_based.average_dependents_per_word,
+                 dependency_based.average_longest_shortest_path,
+                 dependency_based.average_punctuation_per_sentence]
     const_based = [constituent_based.average_t_units,
                    constituent_based.average_complex_t_units,
                    constituent_based.average_clauses,

@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from complexity_measures import syntactic_complexity
+from complexity_measures import dependency_based
 from complexity_measures import utils
 
 
@@ -20,15 +20,15 @@ def main():
     for idx, text in metadata.iterrows():
         with open("/ccl/projects/Kallimachos/low_high_brow_corpus/all_by_id/%s.jtf" % text["ID"]) as f:
             sentence_graphs = list(utils.read_jtf_graphs(f))
-        add, add_stdev = syntactic_complexity.average_average_dependency_distance(sentence_graphs)
-        cc, cc_stdev = syntactic_complexity.average_closeness_centrality(sentence_graphs)
-        odc, odc_stdev = syntactic_complexity.average_outdegree_centralization(sentence_graphs)
-        ccentr, ccentr_stdev = syntactic_complexity.average_closeness_centralization(sentence_graphs)
-        asl, asl_stdev = syntactic_complexity.average_sentence_length(sentence_graphs)
-        dpw, dpw_stdev = syntactic_complexity.average_dependents_per_word(sentence_graphs)
-        lsp, lsp_stdev = syntactic_complexity.average_longest_shortest_path(sentence_graphs)
-        pps, pps_stdev = syntactic_complexity.average_punctuation_per_sentence(sentence_graphs)
-        ppt = syntactic_complexity.average_punctuation_per_token(sentence_graphs)
+        add, add_stdev = dependency_based.average_average_dependency_distance(sentence_graphs)
+        cc, cc_stdev = dependency_based.average_closeness_centrality(sentence_graphs)
+        odc, odc_stdev = dependency_based.average_outdegree_centralization(sentence_graphs)
+        ccentr, ccentr_stdev = dependency_based.average_closeness_centralization(sentence_graphs)
+        asl, asl_stdev = dependency_based.average_sentence_length(sentence_graphs)
+        dpw, dpw_stdev = dependency_based.average_dependents_per_word(sentence_graphs)
+        lsp, lsp_stdev = dependency_based.average_longest_shortest_path(sentence_graphs)
+        pps, pps_stdev = dependency_based.average_punctuation_per_sentence(sentence_graphs)
+        ppt = dependency_based.average_punctuation_per_token(sentence_graphs)
         dependency_distance.append(add)
         dependency_distance_stdev.append(add_stdev)
         closeness_centrality.append(cc)
