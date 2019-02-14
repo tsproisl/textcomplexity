@@ -79,7 +79,7 @@ def read_txt_csv_sentences(f):
     yield sentence
 
 
-def read_txt_csv_graphs(f):
+def read_txt_csv_graphs(f, warnings=True):
     """Read a file in txt.csv format, i.e. a tab-separated file with 21
     columns, convert the dependency parses to networkx graphs and the
     phrase structure trees to NLTK ParentedTrees.
@@ -102,7 +102,13 @@ def read_txt_csv_graphs(f):
                 g.node[tid]["root"] = "root"
             else:
                 g.add_edge(gov, tid, relation=rel)
-            tree_frag = tree_frag.replace("*", "(%s %s)" % (token[9], token[6]))
+            tree_tok = token[6]
+            tree_tok = tree_tok.replace("(", "-LRB-")
+            tree_tok = tree_tok.replace(")", "-RRB-")
+            tree_pos = token[9]
+            tree_pos = tree_pos.replace("(", "-LRB-")
+            tree_pos = tree_pos.replace(")", "-RRB-")
+            tree_frag = tree_frag.replace("*", "(%s %s)" % (tree_pos, tree_tok))
             tree.append(tree_frag)
         tree = "".join(tree)
         sensible, explanation = is_sensible_graph(g)
@@ -110,11 +116,13 @@ def read_txt_csv_graphs(f):
             try:
                 tree = ParentedTree.fromstring(tree)
             except ValueError:
-                logging.warn("Failed to construct parse tree. Ignoring sentence with ID %s." % sentence_id)
+                if warnings:
+                    logging.warn("Failed to construct parse tree. Ignoring sentence with ID %s: %s" % (sentence_id, tree))
             else:
                 yield g, tree
         else:
-            logging.warn("%s. Ignoring sentence with ID %s." % (explanation, sentence_id))
+            if warnings:
+                logging.warn("%s. Ignoring sentence with ID %s." % (explanation, sentence_id))
 
 
 def is_sensible_graph(g):
