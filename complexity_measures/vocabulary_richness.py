@@ -6,7 +6,7 @@ import statistics
 import warnings
 
 import scipy.stats
-
+import pyphen
 
 # ------------------------------------------------- #
 # MEASURES THAT USE SAMPLE SIZE AND VOCABULARY SIZE #
@@ -61,6 +61,21 @@ def cttr(text_length, vocabulary_size):
 def summer_s(text_length, vocabulary_size):
     """Summer's S index"""
     return math.log(math.log(vocabulary_size)) / math.log(math.log(text_length))
+
+
+def sttr(tokens, window_size=1000, ci=False):
+    """calculate standardized type-token ratio
+    originally Kubat&Milicka 2013. Much better explained
+    in Evert et al. 2017.
+    :param ci:  additionally calculate and return the confidence interval, returns a tuple
+    """
+    results = []
+    for i in range(int(len(tokens) / window_size)):  # ignore last partial chunk
+        text_length, vocabulary_size = preprocess(tokens[i * window_size:(i * window_size) + window_size])
+        results.append(type_token_ratio(text_length, vocabulary_size))
+    if ci:
+        return (statistics.mean(results), _sttr_ci(results))
+    return statistics.mean(results)
 
 
 # ------------------------------------------------ #
@@ -203,24 +218,46 @@ def mtld(tokens, factor_size=0.72):
     return statistics.mean((forward_mtld, reverse_mtld))
 
 
+# ------------ #
+# Length-based #
+# ------------ #
+
+def average_token_length_characters(tokens, stdev=True, raw=False):
+    """Average token length in characters."""
+    token_lengths = [len(t) for t in tokens]
+    if raw:
+        return token_lengths
+    mean_length = statistics.mean(token_lengths)
+    if stdev:
+        return mean_length, statistics.stdev(token_lengths)
+    return mean_length
+
+
+def average_token_length_syllables(tokens, lang="de_DE", stdev=True, raw=False):
+    """Average token length in syllables. Pyphen uses the Hunspell
+    hyphenation dictionaries
+
+    """
+    dic = pyphen.Pyphen(lang=lang)
+    token_lengths = []
+    for token in tokens:
+        hyphens = dic.positions(token)
+        token_lengths.append(len(hyphens) + 1)
+    if raw:
+        return token_lengths
+    mean_length = statistics.mean(token_lengths)
+    if stdev:
+        return mean_length, statistics.stdev(token_lengths)
+    return mean_length
+
+
+# ---------------- #
+# Helper functions #
+# ---------------- #
+
 def _sttr_ci(results):
     """calculate the confidence interval for sttr """
     return 1.96 * statistics.stdev(results) / math.sqrt(len(results))
-
-
-def sttr(tokens, window_size=1000, ci=False):
-    """calculate standardized type-token ratio
-    originally Kubat&Milicka 2013. Much better explained
-    in Evert et al. 2017.
-    :param ci:  additionally calculate and return the confidence interval, returns a tuple
-    """
-    results = []
-    for i in range(int(len(tokens) / window_size)):  # ignore last partial chunk
-        text_length, vocabulary_size = preprocess(tokens[i * window_size:(i * window_size) + window_size])
-        results.append(type_token_ratio(text_length, vocabulary_size))
-    if ci:
-        return (statistics.mean(results), _sttr_ci(results))
-    return statistics.mean(results)
 
 
 def preprocess(tokens, fs=False):
