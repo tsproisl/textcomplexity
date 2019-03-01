@@ -39,14 +39,14 @@ def sentence_length_characters(g):
     assume a space between all tokens.
 
     """
-    tokens = [l["word"] for v, l in g.nodes(data=True)]
+    tokens = [l["token"] for v, l in g.nodes(data=True)]
     token_lengths = vocabulary_richness.average_token_length_characters(tokens, raw=True)
     return sum(token_lengths) + len(token_lengths) - 1
 
 
 def average_sentence_length_syllables(sentence_graphs, lang="de_DE"):
     """"""
-    tokens = [l["word"] for g in sentence_graphs for v, l in g.nodes(data=True)]
+    tokens = [l["token"] for g in sentence_graphs for v, l in g.nodes(data=True)]
     token_lengths = vocabulary_richness.average_token_length_syllables(tokens, lang, raw=True)
     position = 0
     sentence_lengths = []
