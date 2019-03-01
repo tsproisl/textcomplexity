@@ -146,7 +146,7 @@ def height(tree):
 
 
 def _tgrep_count_and_lengths(tree, pattern):
-    """Number and lenghts of constituent"""
+    """Number and lengths of constituent"""
     result = nltk_tgrep.tgrep_nodes(tree, pattern)
     result = [r for r in result if isinstance(r, nltk.tree.ParentedTree)]
     lengths = [len(r.leaves()) for r in result]
