@@ -5,19 +5,43 @@ and stylistic complexity of (literary) texts.
 
 ## Usage ##
 
-column-based input format
-
+You can use the script `bin/lascomplexity.py` to compute all
+implemented complexity measures from the command line. The
 vocabulary-based and dependency-based complexity measures are language
-independent, constituent-based measures rely on the NEGRA parsing
-scheme
+independent, the constituent-based measures rely on the NEGRA parsing
+scheme, i.e. can only be applied to German data.
 
-idx word pos head rel tree
-
+The input has to be a CoNLL-style text file with six tab-separated
+columns and an empty line after each sentence. The six columns are:
 word index, word, part-of-speech tag, index of dependency head,
-dependency relation, phrase structure tree
+dependency relation, phrase structure tree. Missing values can be
+represented by an underscore (`_`). Here is a short example with two
+sentences:
 
-[Kallimachos preprocessing
-pipeline](https://gitlab2.informatik.uni-wuerzburg.de/kallimachos/KallimachosEngines)
+    1	Das	ART	3	NK	(TOP(S(NP*
+    2	fremde	ADJA	3	NK	*
+    3	Schiff	NN	4	SB	*)
+    4	war	VAFIN	-1	--	*
+    5	nicht	PTKNEG	6	NG	(AVP*
+    6	allein	ADV	4	MO	*)
+    7	.	$.	6	--	*))
+    
+    1	Sieben	CARD	2	NK	(TOP(S(NP*
+    2	weitere	ADJA	3	MO	*)
+    3	begleiteten	VVFIN	-1	--	*
+    4	es	PPER	3	OA	*
+    5	.	$.	4	--	*))
+
+Without any options, the script computes all measures:
+
+    lascomplexity.py <file>
+
+You can also request subsets of the measures via the `-v`/`--voc`,
+`-d`/`--dep` and `-c`/`--const` options for vocabulary-based,
+dependency-based and constituent-based measures. More detailed usage
+information is available via:
+
+    lascomplexity.py -h
 
 ## Vocabulary-based complexity measures ##
 
@@ -58,7 +82,7 @@ pipeline](https://gitlab2.informatik.uni-wuerzburg.de/kallimachos/KallimachosEng
   * MTLD
   * Kubat and Milicka's STTR
 
-## Syntactic complexity measures ##
+## Shallow syntactic complexity measures ##
 
   * Average sentence length
   * Average punctuation per sentence
