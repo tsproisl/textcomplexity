@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
+import itertools
+import logging
 
 from complexity_measures import dependency_based
 from complexity_measures import constituent_based
@@ -13,12 +15,13 @@ def arguments():
     parser.add_argument("-v", "--voc", action="store_true", help="Compute vocabulary-based complexity measures")
     parser.add_argument("-d", "--dep", action="store_true", help="Compute dependency-based complexity measures")
     parser.add_argument("-c", "--const", action="store_true", help="Compute constituent-based complexity measures")
-    parser.add_argument("TEXT", type=argparse.FileType("r", encoding="utf-8"), help="Input file. Path to a file or "-" for STDIN. A CoNLL-style text file with six tab-separated columns and an empty line after each sentence. The columns are: word index, word, part-of-speech tag, index of dependency head, dependency relation, phrase structure tree. Missing values can be replaced with an underscore (_).")
+    parser.add_argument("TEXT", type=argparse.FileType("r", encoding="utf-8"), help="Input file. Path to a file or \"-\" for STDIN. A CoNLL-style text file with six tab-separated columns and an empty line after each sentence. The columns are: word index, word, part-of-speech tag, index of dependency head, dependency relation, phrase structure tree. Missing values can be replaced with an underscore (_).")
     return parser.parse_args()
 
 
 def vocabulary_measures(tokens):
     """"""
+    tokens = list(itertools.chain.from_iterable(tokens))
     lexical = ["type_token_ratio", "guiraud_r", "herdan_c",
                "dugast_k", "maas_a2", "dugast_u", "tuldava_ln",
                "brunet_w", "cttr", "summer_s", "sichel_s",
@@ -26,33 +29,51 @@ def vocabulary_measures(tokens):
                "yule_k", "simpson_d", "hdd", "mtld"]
     word_length = [vocabulary_richness.average_token_length_characters,
                    vocabulary_richness.average_token_length_syllables]
+    word_length_names = ["average_token_length_characters", "average_token_length_syllables"]
     for measure in lexical:
         score, ci = vocabulary_richness.bootstrap(tokens, measure=measure, window_size=5000, ci=True)
-        print("", score, ci, sep="\t", end="")
-    for wl in word_length:
+        print(measure, score, ci, sep="\t")
+    for wl, wl_name in zip(word_length, word_length_names):
         score, stdev = wl(tokens)
-        print("", score, stdev, sep="\t", end="")
+        print(wl_name, score, stdev, sep="\t")
 
 
 def dependency_measures(graphs):
     """"""
+    sentences = len(graphs)
+    graphs = [g for g in graphs if g is not None]
+    logging.warn("Ignored %d sentences without sensible dependency analyses." % (sentences - len(graphs)))
     measures = [dependency_based.average_average_dependency_distance,
                 dependency_based.average_closeness_centrality,
                 dependency_based.average_outdegree_centralization,
                 dependency_based.average_closeness_centralization,
+                dependency_based.average_dependents_per_word,
+                dependency_based.average_longest_shortest_path,
+                # TODO: move to own function and operate on tokens
                 dependency_based.average_sentence_length,
                 dependency_based.average_sentence_length_characters,
                 dependency_based.average_sentence_length_syllables,
-                dependency_based.average_dependents_per_word,
-                dependency_based.average_longest_shortest_path,
                 dependency_based.average_punctuation_per_sentence]
-    for measure in measures:
+    names = ["average_dependency_distance",
+             "closeness_centrality",
+             "outdegree_centralization",
+             "closeness_centralization",
+             "dependents_per_word",
+             "longest_shortest_path",
+             "sentence_length",
+             "sentence_length_characters",
+             "sentence_length_syllables",
+             "punctuation_per_sentence"]
+    for measure, name in zip(measures, names):
         score, stdev = measure(graphs)
-        print("", score, stdev, sep="\t", end="")
+        print(name, score, stdev, sep="\t")
 
 
 def constituent_measures(trees):
     """"""
+    sentences = len(trees)
+    trees = [t for t in trees if t is not None]
+    logging.warn("Ignored %d sentences without sensible phrase structure trees." % (sentences - len(trees)))
     measures = [constituent_based.average_t_units,
                 constituent_based.average_complex_t_units,
                 constituent_based.average_clauses,
@@ -64,11 +85,26 @@ def constituent_measures(trees):
                 constituent_based.average_constituents,
                 constituent_based.average_constituents_wo_leaves,
                 constituent_based.average_height]
-    for measure in measures:
+    names = ["t_units",
+             "complex_t_units",
+             "clauses",
+             "dependent_clauses",
+             "nps",
+             "vps",
+             "pps",
+             "coordinate_phrases",
+             "constituents",
+             "constituents_wo_leaves",
+             "height"]
+    for measure, name in zip(measures, names):
         result = measure(trees)
-        if isinstance(result, tuple):
-            result = "\t".join(str(r) for r in result)
-        print("", result, sep="\t", end="")
+        if len(result) == 4:
+            print(name, result[0], result[1], sep="\t")
+            print("%s_length" % name, result[2], result[3], sep="\t")
+        elif len(result) == 2:
+            print(name, result[0], result[1], sep="\t")
+        else:
+            logging.warn("I expected either two or four elements!")
 
 
 def main():
