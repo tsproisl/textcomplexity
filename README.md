@@ -3,6 +3,22 @@
 This project is a collection of measures that assess the linguistic
 and stylistic complexity of (literary) texts.
 
+## Usage ##
+
+column-based input format
+
+vocabulary-based and dependency-based complexity measures are language
+independent, constituent-based measures rely on the NEGRA parsing
+scheme
+
+idx word pos head rel tree
+
+word index, word, part-of-speech tag, index of dependency head,
+dependency relation, phrase structure tree
+
+[Kallimachos preprocessing
+pipeline](https://gitlab2.informatik.uni-wuerzburg.de/kallimachos/KallimachosEngines)
+
 ## Vocabulary-based complexity measures ##
 
 ### Measures that use sample size and vocabulary size ###
