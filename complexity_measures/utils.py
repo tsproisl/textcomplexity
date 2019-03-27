@@ -147,3 +147,82 @@ def is_sensible_graph(g):
     if not all([networkx.has_path(g, root, v) for v in other_vertices]):
         return False, "The vertex labeled as 'root' is not actually a root"
     return True, ""
+
+
+def get_sentences(f):
+    """A generator over the sentences in f."""
+    sentence = []
+    for line in f:
+        line = line.strip()
+        if line == "":
+            yield sentence
+            sentence = []
+        else:
+            sentence.append(line.split("\t"))
+    if len(sentence) > 0:
+        yield sentence
+
+
+def read_tsv(f, voc=True, dep=True, const=True, warnings=True):
+    """Read a tab-separated file with six columns: word index, word,
+    part-of-speech tag, index of dependency head, dependency relation,
+    phrase structure tree. There must be an empty line after each
+    sentence. Missing values can be replaced with an underscore (_).
+
+    """
+    def attributes(t):
+        return int(t[0]), {"token": t[1], "pos": t[2]}
+
+    sentences = get_sentences(f)
+    for sentence_id, sentence in enumerate(sentences):
+        try:
+            assert all((len(t) == 6 for t in sentence))
+        except AssertionError:
+            logging.warn("Malformed sentence (no. %d) does not have six columns: %s" % (sentence_id, repr(sentence)))
+            continue
+        result = []
+        if voc:
+            tokens = [t[1] for t in sentence]
+            result.append(tokens)
+        else:
+            result.append(None)
+        if dep:
+            g = networkx.DiGraph(sentence_id=sentence_id)
+            g.add_nodes_from([attributes(t) for t in sentence])
+            for token in sentence:
+                tid = int(token[0])
+                gov = int(token[3])
+                rel = token[4]
+                if gov == -1:
+                    g.node[tid]["root"] = "root"
+                else:
+                    g.add_edge(gov, tid, relation=rel)
+            sensible, explanation = is_sensible_graph(g)
+            if not sensible:
+                logging.warn("%s. Ignoring sentence with ID %s." % (explanation, sentence_id))
+                g = None
+            result.append(g)
+        else:
+            result.append(None)
+        if const:
+            tree = []
+            for token in sentence:
+                tree_frag = token[5]
+                tree_tok = token[1]
+                tree_tok = tree_tok.replace("(", "-LRB-")
+                tree_tok = tree_tok.replace(")", "-RRB-")
+                tree_pos = token[2]
+                tree_pos = tree_pos.replace("(", "-LRB-")
+                tree_pos = tree_pos.replace(")", "-RRB-")
+                tree_frag = tree_frag.replace("*", "(%s %s)" % (tree_pos, tree_tok))
+                tree.append(tree_frag)
+            tree = "".join(tree)
+            try:
+                tree = ParentedTree.fromstring(tree)
+            except ValueError:
+                logging.warn("Failed to construct parse tree from sentence %s: %s" % (sentence_id, tree))
+                tree = None
+            result.append(tree)
+        else:
+            result.append(None)
+        yield result
