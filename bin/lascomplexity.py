@@ -114,6 +114,7 @@ def main():
         args.dep = True
         args.const = True
     tokens, graphs, trees = zip(*utils.read_tsv(args.TEXT, args.voc, args.dep, args.const))
+    print("measure", "score", "stdev/ci", sep="\t")
     vocabulary_measures(tokens)
     dependency_measures(graphs)
     constituent_measures(trees)
