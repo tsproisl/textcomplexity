@@ -187,42 +187,48 @@ def read_tsv(f, voc=True, dep=True, const=True, warnings=True):
         else:
             result.append(None)
         if dep:
-            g = networkx.DiGraph(sentence_id=sentence_id)
-            g.add_nodes_from([attributes(t) for t in sentence])
-            for token in sentence:
-                tid = int(token[0])
-                gov = int(token[3])
-                rel = token[4]
-                if gov == -1:
-                    g.node[tid]["root"] = "root"
-                else:
-                    g.add_edge(gov, tid, relation=rel)
-            sensible, explanation = is_sensible_graph(g)
-            if not sensible:
-                logging.warn("%s. Ignoring sentence with ID %s." % (explanation, sentence_id))
-                g = None
-            result.append(g)
+            if any((t[3] == "_" for t in sentence)) or any((t[4] == "_" for t in sentence)):
+                result.append(None)
+            else:
+                g = networkx.DiGraph(sentence_id=sentence_id)
+                g.add_nodes_from([attributes(t) for t in sentence])
+                for token in sentence:
+                    tid = int(token[0])
+                    gov = int(token[3])
+                    rel = token[4]
+                    if gov == -1:
+                        g.node[tid]["root"] = "root"
+                    else:
+                        g.add_edge(gov, tid, relation=rel)
+                sensible, explanation = is_sensible_graph(g)
+                if not sensible:
+                    logging.warn("%s. Ignoring sentence with ID %s." % (explanation, sentence_id))
+                    g = None
+                result.append(g)
         else:
             result.append(None)
         if const:
-            tree = []
-            for token in sentence:
-                tree_frag = token[5]
-                tree_tok = token[1]
-                tree_tok = tree_tok.replace("(", "-LRB-")
-                tree_tok = tree_tok.replace(")", "-RRB-")
-                tree_pos = token[2]
-                tree_pos = tree_pos.replace("(", "-LRB-")
-                tree_pos = tree_pos.replace(")", "-RRB-")
-                tree_frag = tree_frag.replace("*", "(%s %s)" % (tree_pos, tree_tok))
-                tree.append(tree_frag)
-            tree = "".join(tree)
-            try:
-                tree = ParentedTree.fromstring(tree)
-            except ValueError:
-                logging.warn("Failed to construct parse tree from sentence %s: %s" % (sentence_id, tree))
-                tree = None
-            result.append(tree)
+            if any((t[5] == "_" for t in sentence)):
+                result.append(None)
+            else:
+                tree = []
+                for token in sentence:
+                    tree_frag = token[5]
+                    tree_tok = token[1]
+                    tree_tok = tree_tok.replace("(", "-LRB-")
+                    tree_tok = tree_tok.replace(")", "-RRB-")
+                    tree_pos = token[2]
+                    tree_pos = tree_pos.replace("(", "-LRB-")
+                    tree_pos = tree_pos.replace(")", "-RRB-")
+                    tree_frag = tree_frag.replace("*", "(%s %s)" % (tree_pos, tree_tok))
+                    tree.append(tree_frag)
+                tree = "".join(tree)
+                try:
+                    tree = ParentedTree.fromstring(tree)
+                except ValueError:
+                    logging.warn("Failed to construct parse tree from sentence %s: %s" % (sentence_id, tree))
+                    tree = None
+                result.append(tree)
         else:
             result.append(None)
         yield result
