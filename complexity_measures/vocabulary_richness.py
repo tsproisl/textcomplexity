@@ -84,17 +84,17 @@ def sttr(tokens, window_size=1000, ci=False):
 
 def sichel_s(vocabulary_size, frequency_spectrum):
     """Sichel (1975)"""
-    return frequency_spectrum[2] / vocabulary_size
+    return frequency_spectrum.get(2, 0) / vocabulary_size
 
 
 def michea_m(vocabulary_size, frequency_spectrum):
     """Michéa (1969, 1971)"""
-    return vocabulary_size / frequency_spectrum[2]
+    return vocabulary_size / frequency_spectrum.get(2, 0)
 
 
 def honore_h(text_length, vocabulary_size, frequency_spectrum):
     """Honoré (1979)"""
-    return 100 * (math.log(text_length) / (1 - ((frequency_spectrum[1]) / (vocabulary_size))))
+    return 100 * (math.log(text_length) / (1 - ((frequency_spectrum.get(1, 0)) / (vocabulary_size))))
 
 
 # ---------------------------------------------- #
