@@ -15,6 +15,7 @@ def arguments():
     parser.add_argument("-v", "--voc", action="store_true", help="Compute vocabulary-based complexity measures")
     parser.add_argument("-d", "--dep", action="store_true", help="Compute dependency-based complexity measures")
     parser.add_argument("-c", "--const", action="store_true", help="Compute constituent-based complexity measures")
+    parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation")
     parser.add_argument("TEXT", type=argparse.FileType("r", encoding="utf-8"), help="Input file. Path to a file or \"-\" for STDIN. A CoNLL-style text file with six tab-separated columns and an empty line after each sentence. The columns are: word index, word, part-of-speech tag, index of dependency head, dependency relation, phrase structure tree. Missing values can be replaced with an underscore (_).")
     return parser.parse_args()
 
@@ -113,7 +114,7 @@ def main():
         args.voc = True
         args.dep = True
         args.const = True
-    tokens, graphs, trees = zip(*utils.read_tsv(args.TEXT, args.voc, args.dep, args.const))
+    tokens, graphs, trees = zip(*utils.read_tsv(args.TEXT, args.voc, args.dep, args.const, args.ignore_punct))
     print("measure", "score", "stdev/ci", sep="\t")
     vocabulary_measures(tokens)
     dependency_measures(graphs)

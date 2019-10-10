@@ -163,7 +163,7 @@ def get_sentences(f):
         yield sentence
 
 
-def read_tsv(f, voc=True, dep=True, const=True, warnings=True):
+def read_tsv(f, voc=True, dep=True, const=True, ignore_punct=False, warnings=True):
     """Read a tab-separated file with six columns: word index, word,
     part-of-speech tag, index of dependency head, dependency relation,
     phrase structure tree. There must be an empty line after each
