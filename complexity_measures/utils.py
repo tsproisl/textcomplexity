@@ -2,6 +2,7 @@
 
 import collections
 import logging
+import unicodedata
 
 import networkx
 from nltk.tree import ParentedTree
@@ -183,6 +184,8 @@ def read_tsv(f, voc=True, dep=True, const=True, ignore_punct=False, warnings=Tru
         result = []
         if voc:
             tokens = [t[1] for t in sentence]
+            if ignore_punct:
+                tokens = [t for t in tokens if not all((unicodedata.category(c)[0] == "P" for c in t))]
             result.append(tokens)
         else:
             result.append(None)
