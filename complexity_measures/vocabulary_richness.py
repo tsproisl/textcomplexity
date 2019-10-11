@@ -39,7 +39,8 @@ def maas_a2(text_length, vocabulary_size):
 
 def dugast_u(text_length, vocabulary_size):
     """Dugast (1978, 1979)"""
-    # as suggested by Andreas, we decrease the vocabulary size by 1
+    # as suggested by Andreas, we decrease the vocabulary size by 1,
+    # if we only have hapaxes
     if text_length == vocabulary_size:
         vocabulary_size -= 1
     return (math.log(text_length) ** 2) / (math.log(text_length) - math.log(vocabulary_size))
