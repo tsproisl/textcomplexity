@@ -16,12 +16,13 @@ def arguments():
     parser.add_argument("-d", "--dep", action="store_true", help="Compute dependency-based complexity measures")
     parser.add_argument("-c", "--const", action="store_true", help="Compute constituent-based complexity measures")
     parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation (currently only implemented for vocabulary-based complexity measures)")
+    parser.add_argument("--only-robust", action="store_true", help="Use only robust vocabulary-based complexity measures that can cope with very small window sizes")
     parser.add_argument("--window-size", default=5000, type=int, help="Window size for vocabulary-based complexity measures (default: 5000)")
     parser.add_argument("TEXT", type=argparse.FileType("r", encoding="utf-8"), help="Input file. Path to a file or \"-\" for STDIN. A CoNLL-style text file with six tab-separated columns and an empty line after each sentence. The columns are: word index, word, part-of-speech tag, index of dependency head, dependency relation, phrase structure tree. Missing values can be replaced with an underscore (_).")
     return parser.parse_args()
 
 
-def vocabulary_measures(tokens, window_size=5000):
+def vocabulary_measures(tokens, window_size=5000, only_robust=False):
     """"""
     tokens = list(itertools.chain.from_iterable(tokens))
     lexical = ["type_token_ratio", "guiraud_r", "herdan_c",
@@ -29,10 +30,18 @@ def vocabulary_measures(tokens, window_size=5000):
                "brunet_w", "cttr", "summer_s", "sichel_s",
                "michea_m", "honore_h", "herdan_vm", "entropy",
                "yule_k", "simpson_d", "hdd", "mtld"]
+    robust_lexical = ["type_token_ratio", "guiraud_r", "herdan_c",
+               "dugast_k", "maas_a2", "tuldava_ln",
+               "brunet_w", "cttr", "summer_s", "sichel_s",
+               "honore_h", "entropy",
+               "yule_k", "simpson_d", "hdd"]
+    measures = lexical
+    if only_robust:
+        measures = robust_lexical
     word_length = [vocabulary_richness.average_token_length_characters,
                    vocabulary_richness.average_token_length_syllables]
     word_length_names = ["average_token_length_characters", "average_token_length_syllables"]
-    for measure in lexical:
+    for measure in measures:
         score, ci = vocabulary_richness.bootstrap(tokens, measure=measure, window_size=window_size, ci=True)
         print(measure, score, ci, sep="\t")
     for wl, wl_name in zip(word_length, word_length_names):
@@ -118,7 +127,7 @@ def main():
     tokens, graphs, trees = zip(*utils.read_tsv(args.TEXT, args.voc, args.dep, args.const, args.ignore_punct))
     print("measure", "score", "stdev/ci", sep="\t")
     if args.voc:
-        vocabulary_measures(tokens, args.window_size)
+        vocabulary_measures(tokens, args.window_size, args.only_robust)
     if args.dep:
         dependency_measures(graphs)
     if args.const:

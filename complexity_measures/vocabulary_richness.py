@@ -93,12 +93,21 @@ def sichel_s(vocabulary_size, frequency_spectrum):
 
 def michea_m(vocabulary_size, frequency_spectrum):
     """Michéa (1969, 1971)"""
-    return vocabulary_size / frequency_spectrum.get(2, 0)
+    try:
+        return vocabulary_size / frequency_spectrum.get(2, 0)
+    except ZeroDivisionError:
+        # Set frequency of dis legomena to 1
+        return vocabulary_size
 
 
 def honore_h(text_length, vocabulary_size, frequency_spectrum):
     """Honoré (1979)"""
-    return 100 * (math.log(text_length) / (1 - ((frequency_spectrum.get(1, 0)) / (vocabulary_size))))
+    # Similar to dugast_u, we decrease the number of hapax legomena by
+    # 1, if we only have hapaxes
+    hapaxes = frequency_spectrum.get(1, 0)
+    if hapaxes == vocabulary_size:
+        hapaxes -= 1
+    return 100 * (math.log(text_length) / (1 - (hapaxes / vocabulary_size)))
 
 
 # ---------------------------------------------- #
