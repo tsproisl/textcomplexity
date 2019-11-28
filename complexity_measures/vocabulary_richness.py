@@ -207,7 +207,7 @@ def mtld(tokens, factor_size=0.72):
     """
     def _mtld(tokens, factor_size, reverse=False):
         factors = 0
-        factor_lengths = []
+        # factor_lengths = []
         types = set()
         token_count = 0
         token_iterator = iter(tokens)
@@ -218,13 +218,13 @@ def mtld(tokens, factor_size=0.72):
             token_count += 1
             if len(types) / token_count <= factor_size:
                 factors += 1
-                factor_lengths.append(token_count)
+                # factor_lengths.append(token_count)
                 types = set()
                 token_count = 0
         if token_count > 0:
             ttr = len(types) / token_count
             factors += (1 - ttr) / (1 - factor_size)
-            factor_lengths.append(token_count)
+            # factor_lengths.append(token_count)
         return len(tokens) / factors
     forward_mtld = _mtld(tokens, factor_size)
     reverse_mtld = _mtld(tokens, factor_size, reverse=True)
