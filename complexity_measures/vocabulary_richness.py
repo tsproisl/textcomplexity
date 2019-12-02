@@ -6,7 +6,7 @@ import statistics
 import warnings
 
 import scipy.stats
-import pyphen
+# import pyphen
 
 # ------------------------------------------------- #
 # MEASURES THAT USE SAMPLE SIZE AND VOCABULARY SIZE #
@@ -260,22 +260,22 @@ def average_token_length_characters(tokens, stdev=True, raw=False):
     return mean_length
 
 
-def average_token_length_syllables(tokens, lang="de_DE", stdev=True, raw=False):
-    """Average token length in syllables. Pyphen uses the Hunspell
-    hyphenation dictionaries
+# def average_token_length_syllables(tokens, lang="de_DE", stdev=True, raw=False):
+#     """Average token length in syllables. Pyphen uses the Hunspell
+#     hyphenation dictionaries
 
-    """
-    dic = pyphen.Pyphen(lang=lang)
-    token_lengths = []
-    for token in tokens:
-        hyphens = dic.positions(token)
-        token_lengths.append(len(hyphens) + 1)
-    if raw:
-        return token_lengths
-    mean_length = statistics.mean(token_lengths)
-    if stdev:
-        return mean_length, statistics.stdev(token_lengths)
-    return mean_length
+#     """
+#     dic = pyphen.Pyphen(lang=lang)
+#     token_lengths = []
+#     for token in tokens:
+#         hyphens = dic.positions(token)
+#         token_lengths.append(len(hyphens) + 1)
+#     if raw:
+#         return token_lengths
+#     mean_length = statistics.mean(token_lengths)
+#     if stdev:
+#         return mean_length, statistics.stdev(token_lengths)
+#     return mean_length
 
 
 # ---------------- #
