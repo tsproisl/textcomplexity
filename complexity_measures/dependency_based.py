@@ -44,16 +44,16 @@ def sentence_length_characters(g):
     return sum(token_lengths) + len(token_lengths) - 1
 
 
-def average_sentence_length_syllables(sentence_graphs, lang="de_DE"):
-    """"""
-    tokens = [l["token"] for g in sentence_graphs for v, l in g.nodes(data=True)]
-    token_lengths = vocabulary_richness.average_token_length_syllables(tokens, lang, raw=True)
-    position = 0
-    sentence_lengths = []
-    for g in sentence_graphs:
-        sentence_lengths.append(sum(token_lengths[position:position + len(g)]))
-        position += len(g)
-    return statistics.mean(sentence_lengths), statistics.stdev(sentence_lengths)
+# def average_sentence_length_syllables(sentence_graphs, lang="de_DE"):
+#     """"""
+#     tokens = [l["token"] for g in sentence_graphs for v, l in g.nodes(data=True)]
+#     token_lengths = vocabulary_richness.average_token_length_syllables(tokens, lang, raw=True)
+#     position = 0
+#     sentence_lengths = []
+#     for g in sentence_graphs:
+#         sentence_lengths.append(sum(token_lengths[position:position + len(g)]))
+#         position += len(g)
+#     return statistics.mean(sentence_lengths), statistics.stdev(sentence_lengths)
 
 
 # ---------------------

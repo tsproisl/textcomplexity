@@ -38,14 +38,20 @@ def vocabulary_measures(tokens, window_size=5000, only_robust=False):
     measures = lexical
     if only_robust:
         measures = robust_lexical
-    word_length = [vocabulary_richness.average_token_length_characters,
-                   vocabulary_richness.average_token_length_syllables]
-    word_length_names = ["average_token_length_characters", "average_token_length_syllables"]
+    word_length = [vocabulary_richness.average_token_length_characters]
+                   # vocabulary_richness.average_token_length_syllables]
+    word_length_names = ["average_token_length_characters"]  # , "average_token_length_syllables"]
     for measure in measures:
-        score, ci = vocabulary_richness.bootstrap(tokens, measure=measure, window_size=window_size, ci=True)
+        try:
+            score, ci = vocabulary_richness.bootstrap(tokens, measure=measure, window_size=window_size, ci=True)
+        except:
+            score, ci = "", ""
         print(measure, score, ci, sep="\t")
     for wl, wl_name in zip(word_length, word_length_names):
-        score, stdev = wl(tokens)
+        try:
+            score, stdev = wl(tokens)
+        except:
+            score, stdev = "", ""
         print(wl_name, score, stdev, sep="\t")
 
 
@@ -63,7 +69,7 @@ def dependency_measures(graphs):
                 # TODO: move to own function and operate on tokens
                 dependency_based.average_sentence_length,
                 dependency_based.average_sentence_length_characters,
-                dependency_based.average_sentence_length_syllables,
+                # dependency_based.average_sentence_length_syllables,
                 dependency_based.average_punctuation_per_sentence]
     names = ["average_dependency_distance",
              "closeness_centrality",
@@ -73,7 +79,7 @@ def dependency_measures(graphs):
              "longest_shortest_path",
              "sentence_length",
              "sentence_length_characters",
-             "sentence_length_syllables",
+             # "sentence_length_syllables",
              "punctuation_per_sentence"]
     for measure, name in zip(measures, names):
         score, stdev = measure(graphs)
