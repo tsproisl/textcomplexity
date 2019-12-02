@@ -231,6 +231,20 @@ def mtld(tokens, factor_size=0.72):
     return statistics.mean((forward_mtld, reverse_mtld))
 
 
+def disparity(tokens, window_size, segment_size):
+    observations = []
+    for chunk in chunker(tokens, window_size):
+        tokencount = collections.Counter()
+        subchunks = list(chunker(chunk, segment_size))
+        for subchunk in subchunks:
+            subchunk = set(subchunk)
+            tokencount.update(subchunk)
+        mean_tokencount = statistics.mean([freq / len(subchunks) for freq in tokencount.values()])
+        observations.append(mean_tokencount)
+    disp = 1 - statistics.mean(observations)
+    return disp
+
+
 # ------------ #
 # Length-based #
 # ------------ #
@@ -267,6 +281,12 @@ def average_token_length_syllables(tokens, lang="de_DE", stdev=True, raw=False):
 # ---------------- #
 # Helper functions #
 # ---------------- #
+
+def chunker(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
+
 
 def _sttr_ci(results):
     """calculate the confidence interval for sttr """
