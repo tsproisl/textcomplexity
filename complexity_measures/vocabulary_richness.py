@@ -8,6 +8,7 @@ import warnings
 import scipy.stats
 # import pyphen
 
+
 # ------------------------------------------------- #
 # MEASURES THAT USE SAMPLE SIZE AND VOCABULARY SIZE #
 # ------------------------------------------------- #
@@ -278,6 +279,22 @@ def average_token_length_characters(tokens, stdev=True, raw=False):
 #     return mean_length
 
 
+# --------------- #
+# Sentence length #
+# --------------- #
+
+def average_sentence_length(sentences):
+    """"""
+    sentence_lengths = [len(s) for s in sentences]
+    return statistics.mean(sentence_lengths), statistics.stdev(sentence_lengths)
+
+
+def average_sentence_length_characters(sentences):
+    """"""
+    sentence_lengths = [sum([len(w) for w in s]) for s in sentences]
+    return statistics.mean(sentence_lengths), statistics.stdev(sentence_lengths)
+
+
 # ---------------- #
 # Helper functions #
 # ---------------- #
@@ -326,7 +343,7 @@ def bootstrap(tokens, measure='type_token_ratio', window_size=1000, ci=False, ra
                     sichel_s=sichel_s, michea_m=michea_m,
                     honore_h=honore_h, entropy=entropy, yule_k=yule_k,
                     simpson_d=simpson_d, herdan_vm=herdan_vm, hdd=hdd,
-                    orlov_z=orlov_z, mtld=mtld)
+                    orlov_z=orlov_z, mtld=mtld, disparity=disparity)
     # tl_vs: text_length, vocabulary_size
     # vs_fs: vocabulary_size, frequency_spectrum
     # tl_vs_fs: text_length, vocabulary_size, frequency_spectrum
@@ -339,7 +356,7 @@ def bootstrap(tokens, measure='type_token_ratio', window_size=1000, ci=False, ra
                    vs_fs=("sichel_s", "michea_m"),
                    tl_vs_fs=("honore_h", "herdan_vm", "orlov_z"),
                    tl_fs=("entropy", "yule_k", "simpson_d", "hdd"),
-                   t=("mtld",))
+                   t=("mtld", "disparity"))
     measure_to_class = {m: c for c, v in classes.items() for m in v}
     func = measures[measure]
     cls = measure_to_class[measure]
