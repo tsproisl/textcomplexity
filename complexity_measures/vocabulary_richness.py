@@ -232,7 +232,7 @@ def mtld(tokens, factor_size=0.72):
     return statistics.mean((forward_mtld, reverse_mtld))
 
 
-def disparity(tokens, window_size, segment_size):
+def dispersion(tokens, window_size, segment_size):
     observations = []
     for chunk in chunker(tokens, window_size):
         tokencount = collections.Counter()
@@ -244,6 +244,21 @@ def disparity(tokens, window_size, segment_size):
         observations.append(mean_tokencount)
     disp = 1 - statistics.mean(observations)
     return disp
+
+
+def disparity(tokens, window_size, segment_size):
+    pass
+    # observations = []
+    # for chunk in chunker(tokens, window_size):
+    #     tokencount = collections.Counter()
+    #     subchunks = list(chunker(chunk, segment_size))
+    #     for subchunk in subchunks:
+    #         subchunk = set(subchunk)
+    #         tokencount.update(subchunk)
+    #     mean_tokencount = statistics.mean([freq / len(subchunks) for freq in tokencount.values()])
+    #     observations.append(mean_tokencount)
+    # disp = 1 - statistics.mean(observations)
+    # return disp
 
 
 # ------------ #
