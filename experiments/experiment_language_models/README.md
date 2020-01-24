@@ -9,6 +9,7 @@ modelling toolkit.
   1. Reformat the training corpus: One sentence per line, tokens
      separated by spaces.
   2. Train a language model:
+  
     ```sh
 zcat /path/to/corpus.txt.gz | bin/lmplz -o3 -S 24G -T /path/to/tmp/ > /path/to/language_model.arpa
     ```
