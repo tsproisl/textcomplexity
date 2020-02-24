@@ -235,3 +235,53 @@ def read_tsv(f, voc=True, dep=True, const=True, ignore_punct=False, warnings=Tru
         else:
             result.append(None)
         yield result
+
+
+def read_conll(f, ignore_punct=False, warnings=True):
+    """Read a tab-separated file with seven columns: word index, word,
+    lemma, part-of-speech tag, empty field (_), index of dependency
+    head, dependency relation. There must be an empty line after each
+    sentence. Missing values can be replaced with an underscore (_).
+
+    """
+    def attributes(t):
+        return int(t[0]), {"token": t[1], "lemma": t[2], "pos": t[3]}
+
+    sentences = get_sentences(f)
+    for sentence_id, sentence in enumerate(sentences):
+        try:
+            assert all((len(t) == 7 for t in sentence))
+        except AssertionError:
+            logging.warn("Malformed sentence (no. %d) does not have six columns: %s" % (sentence_id, repr(sentence)))
+            continue
+        result = []
+        tokens = [t[1] for t in sentence]
+        lemmas = [t[2] for t in sentence]
+        pos = [t[3] for t in sentence]
+        if ignore_punct:
+            punct = [all((unicodedata.category(c)[0] == "P" for c in t)) for t in tokens]
+            tokens = [t for t, p in zip(tokens, punct) if not p]
+            lemmas = [t for t, p in zip(tokens, punct) if not p]
+            pos = [t for t, p in zip(tokens, punct) if not p]
+        result.append(tokens)
+        result.append(lemmas)
+        result.append(pos)
+        if any((t[5] == "_" for t in sentence)) or any((t[6] == "_" for t in sentence)):
+            result.append(None)
+        else:
+            g = networkx.DiGraph(sentence_id=sentence_id)
+            g.add_nodes_from([attributes(t) for t in sentence])
+            for token in sentence:
+                tid = int(token[0])
+                gov = int(token[5])
+                rel = token[6]
+                if gov == 0:
+                    g.node[tid]["root"] = "root"
+                else:
+                    g.add_edge(gov, tid, relation=rel)
+            sensible, explanation = is_sensible_graph(g)
+            if not sensible:
+                logging.warn("%s. Ignoring sentence with ID %s." % (explanation, sentence_id))
+                g = None
+            result.append(g)
+        yield result
