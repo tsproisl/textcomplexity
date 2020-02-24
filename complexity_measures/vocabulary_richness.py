@@ -232,18 +232,56 @@ def mtld(tokens, factor_size=0.72):
     return statistics.mean((forward_mtld, reverse_mtld))
 
 
+def gries_dp(tokens, window_size, n_parts):
+    dp, dp_norm = [], []
+    part_size = int(window_size / n_parts)
+    s_percentage_of_part = 1 / n_parts
+    for i in range(int(len(tokens) / window_size)):  # ignore last partial chunk
+        chunk = tokens[i * window_size:(i * window_size) + window_size]
+        f_overall_frequency = collections.Counter()
+        v_frequency_corpus_part = []
+        for j in range(n_parts):
+            part = chunk[j * part_size:(j * part_size) + part_size]
+            v_frequency_corpus_part.append(collections.Counter(part))
+        for v in v_frequency_corpus_part:
+            f_overall_frequency.update(v)
+        dp_scores = {token: sum([v[token] / frequency - s_percentage_of_part for v in v_frequency_corpus_part]) / 2 for token, frequency in f_overall_frequency.items()}
+        dp.append(statistics.mean(dp_scores.values()))
+        dp_norm_scores = {token: score / (1 - s_percentage_of_part) for token, score in dp_scores.items()}
+        dp_norm.append(statistics.mean(dp_norm_scores))
+    return statistics.mean(dp), statistics.mean(dp_norm)
+
+
+def kl_divergence(tokens, window_size, n_parts):
+    kld = []
+    part_size = int(window_size / n_parts)
+    for i in range(int(len(tokens) / window_size)):  # ignore last partial chunk
+        chunk = tokens[i * window_size:(i * window_size) + window_size]
+        f_overall_frequency = collections.Counter()
+        v_frequency_corpus_part = []
+        for j in range(n_parts):
+            part = chunk[j * part_size:(j * part_size) + part_size]
+            v_frequency_corpus_part.append(collections.Counter(part))
+        for v in v_frequency_corpus_part:
+            f_overall_frequency.update(v)
+        kld_scores = {token: sum([(v[token] / frequency) * math.log2((v[token] / frequency) * n_parts) for v in v_frequency_corpus_part]) for token, frequency in f_overall_frequency.items()}
+        kld.append(statistics.mean(kld_scores.values()))
+    return statistics.mean(kld)
+
+
 def dispersion(tokens, window_size, segment_size):
-    observations = []
-    for chunk in chunker(tokens, window_size):
-        tokencount = collections.Counter()
-        subchunks = list(chunker(chunk, segment_size))
-        for subchunk in subchunks:
-            subchunk = set(subchunk)
-            tokencount.update(subchunk)
-        mean_tokencount = statistics.mean([freq / len(subchunks) for freq in tokencount.values()])
-        observations.append(mean_tokencount)
-    disp = 1 - statistics.mean(observations)
-    return disp
+    pass
+    # observations = []
+    # for chunk in chunker(tokens, window_size):
+    #     tokencount = collections.Counter()
+    #     subchunks = list(chunker(chunk, segment_size))
+    #     for subchunk in subchunks:
+    #         subchunk = set(subchunk)
+    #         tokencount.update(subchunk)
+    #         mean_tokencount = statistics.mean([freq / len(subchunks) for freq in tokencount.values()])
+    #         observations.append(mean_tokencount)
+    #         disp = 1 - statistics.mean(observations)
+    # return disp
 
 
 def disparity(tokens, window_size, segment_size):
