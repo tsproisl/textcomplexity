@@ -140,6 +140,11 @@ def hdd(text_length, frequency_spectrum, sample_size=42):
     return sum(((1 - scipy.stats.hypergeom.pmf(0, text_length, freq, sample_size)) / sample_size for word, freq in frequency_spectrum.items()))
 
 
+def evenness(text_length, frequency_spectrum):
+    """https://en.wikipedia.org/wiki/Species_evenness"""
+    return entropy(text_length, frequency_spectrum) / math.log(len(frequency_spectrum))
+
+
 # ---------------------------------- #
 # PARAMETERS OF PROBABILISTIC MODELS #
 # ---------------------------------- #
