@@ -248,7 +248,7 @@ def gries_dp(tokens, window_size, n_parts):
         dp_scores = {token: sum([v[token] / frequency - s_percentage_of_part for v in v_frequency_corpus_part]) / 2 for token, frequency in f_overall_frequency.items()}
         dp.append(statistics.mean(dp_scores.values()))
         dp_norm_scores = {token: score / (1 - s_percentage_of_part) for token, score in dp_scores.items()}
-        dp_norm.append(statistics.mean(dp_norm_scores))
+        dp_norm.append(statistics.mean(dp_norm_scores.values()))
     return statistics.mean(dp), statistics.mean(dp_norm)
 
 
@@ -264,7 +264,7 @@ def kl_divergence(tokens, window_size, n_parts):
             v_frequency_corpus_part.append(collections.Counter(part))
         for v in v_frequency_corpus_part:
             f_overall_frequency.update(v)
-        kld_scores = {token: sum([(v[token] / frequency) * math.log2((v[token] / frequency) * n_parts) for v in v_frequency_corpus_part]) for token, frequency in f_overall_frequency.items()}
+        kld_scores = {token: sum([0 if v[token] == 0 else (v[token] / frequency) * math.log2((v[token] / frequency) * n_parts) for v in v_frequency_corpus_part]) for token, frequency in f_overall_frequency.items()}
         kld.append(statistics.mean(kld_scores.values()))
     return statistics.mean(kld)
 
@@ -431,4 +431,7 @@ def bootstrap(tokens, measure='type_token_ratio', window_size=1000, ci=False, ra
         return results
     if ci:
         return (statistics.mean(results), _sttr_ci(results))
-    return statistics.mean(results)
+    if len(results) == 1:
+        return results[0]
+    else:
+        return statistics.mean(results)

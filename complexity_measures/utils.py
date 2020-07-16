@@ -261,8 +261,8 @@ def read_conll(f, ignore_punct=False, warnings=True):
         if ignore_punct:
             punct = [all((unicodedata.category(c)[0] == "P" for c in t)) for t in tokens]
             tokens = [t for t, p in zip(tokens, punct) if not p]
-            lemmas = [t for t, p in zip(tokens, punct) if not p]
-            pos = [t for t, p in zip(tokens, punct) if not p]
+            lemmas = [t for t, p in zip(lemmas, punct) if not p]
+            pos = [t for t, p in zip(pos, punct) if not p]
         result.append(tokens)
         result.append(lemmas)
         result.append(pos)
