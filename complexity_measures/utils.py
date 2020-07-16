@@ -52,8 +52,37 @@ def moving_windows(tokens, window_size, step_size=1):
     """Yield moving windows of text."""
     text_length = len(tokens)
     assert window_size <= text_length
-    for i in range(0, text_length - window_size + 1, step_size):
-        yield create_text_object(tokens[i:i + window_size])
+    deque = collections.deque(tokens[0:window_size])
+    frequencies = collections.Counter(deque)
+    vocabulary_size = len(frequencies)
+    frequency_spectrum = dict(collections.Counter(frequencies.values()))
+    yield Text(list(deque), window_size, vocabulary_size, frequency_spectrum)
+    for i in range(window_size, text_length - step_size + 1, step_size):
+        for j in range(step_size):
+            new = tokens[i + j]
+            deque.append(new)
+            old = deque.popleft()
+            if new != old:
+                f_new_0 = frequencies[new]
+                f_new_1 = f_new_0 + 1
+                f_old_0 = frequencies[old]
+                f_old_1 = f_old_0 - 1
+                frequencies[new] += 1
+                frequencies[old] -= 1
+                if frequencies[old] == 0:
+                    del frequencies[old]
+                if f_new_0 != 0:
+                    frequency_spectrum[f_new_0] -= 1
+                    if frequency_spectrum[f_new_0] == 0:
+                        del frequency_spectrum[f_new_0]
+                frequency_spectrum[f_new_1] += 1
+                frequency_spectrum[f_old_0] -= 1
+                if frequency_spectrum[f_old_0] == 0:
+                    del frequency_spectrum[f_old_0]
+                if f_old_1 != 0:
+                    frequency_spectrum[f_old_1] += 1
+                vocabulary_size = len(frequencies)
+        yield Text(list(deque), window_size, vocabulary_size, frequency_spectrum)
 
 
 def create_text_object(tokens):
