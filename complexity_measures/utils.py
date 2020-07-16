@@ -2,10 +2,71 @@
 
 import collections
 import logging
+import math
+import statistics
 import unicodedata
 
 import networkx
 from nltk.tree import ParentedTree
+
+
+Text = collections.namedtuple("Text", ["tokens", "text_length", "vocabulary_size", "frequency_spectrum"])
+
+
+def disjoint_windows(tokens, window_size, strategy="spread"):
+    """Yield disjoint windows of text. If the last window would be smaller
+    than window_size, the position of the windows is determined
+    according to strategy.
+
+    strategy="left": Move the windows to the left, omitting tokens at
+    the end of the text.
+
+    strategy="right": Move the windows to the right, omitting tokens
+    at the beginning of the text.
+
+    strategy="center": Move the windows to the center, omitting tokens
+    at the beginning and the end of the text.
+
+    strategy="spread": Spread out the windows, omitting tokens between
+    the windows.
+
+    """
+    strategies = set("left right center spread".split())
+    assert strategy in strategies
+    text_length = len(tokens)
+    assert window_size <= text_length
+    n_windows, rest = divmod(text_length, window_size)
+    for i in range(n_windows):
+        if strategy == "left":
+            skip = 0
+        elif strategy == "right":
+            skip = rest
+        elif strategy == "center":
+            skip = rest // 2
+        elif strategy == "spread":
+            skip = (i * rest) // (n_windows - 1)
+        yield create_text_object(tokens[skip + i * window_size:(skip + i * window_size) + window_size])
+
+
+def moving_windows(tokens, window_size, step_size=1):
+    """Yield moving windows of text."""
+    text_length = len(tokens)
+    assert window_size <= text_length
+    for i in range(0, text_length - window_size + 1, step_size):
+        yield tokens[i:i + window_size]
+
+
+def create_text_object(tokens):
+    """Return text length, vocabulary size and the frequency spectrum."""
+    text_length = len(tokens)
+    frequency_list = collections.Counter(tokens)
+    vocabulary_size = len(frequency_list)
+    frequency_spectrum = dict(collections.Counter(frequency_list.values()))
+    return Text(tokens, text_length, vocabulary_size, frequency_spectrum)
+
+
+def confidence_interval(results):
+    return 1.96 * statistics.stdev(results) / math.sqrt(len(results))
 
 
 def read_jtf_sentences(f):
