@@ -53,7 +53,7 @@ def moving_windows(tokens, window_size, step_size=1):
     text_length = len(tokens)
     assert window_size <= text_length
     for i in range(0, text_length - window_size + 1, step_size):
-        yield tokens[i:i + window_size]
+        yield create_text_object(tokens[i:i + window_size])
 
 
 def create_text_object(tokens):
