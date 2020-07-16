@@ -367,11 +367,6 @@ def kl_divergence(text, n_parts):
     http://www.stgries.info/research/ToApp_STG_Dispersion_PHCL.pdf
 
     """
-    def kld(v_token, frequency, n_parts):
-        if v_token == 0:
-            return 0
-        return (v_token / frequency) * math.log2((v_token / frequency) * n_parts)
-
     part_size = text.text_length // n_parts
     f_overall_frequency = collections.Counter()
     v_frequency_corpus_part = []
@@ -380,7 +375,7 @@ def kl_divergence(text, n_parts):
         v_frequency_corpus_part.append(collections.Counter(part))
     for v in v_frequency_corpus_part:
         f_overall_frequency.update(v)
-    kld_scores = {token: sum([kld(v[token], frequency, n_parts) for v in v_frequency_corpus_part]) for token, frequency in f_overall_frequency.items()}
+    kld_scores = {token: sum([0 if v[token] == 0 else (v[token] / frequency) * math.log2((v[token] / frequency) * n_parts) for v in v_frequency_corpus_part]) for token, frequency in f_overall_frequency.items()}
     return statistics.mean(kld_scores.values())
 
 
