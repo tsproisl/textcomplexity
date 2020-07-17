@@ -5,6 +5,7 @@ import math
 import operator
 import statistics
 
+import numpy as np
 import scipy.optimize
 import scipy.stats
 
@@ -190,7 +191,7 @@ def honore_h(text):
 
 def entropy(text):
     """"""
-    return sum((freq_size * (-math.log(freq / text.text_length)) * (freq / text.text_length) for freq, freq_size in text.frequency_spectrum.items()))
+    return sum((freq_size * (-math.log2(freq / text.text_length)) * (freq / text.text_length) for freq, freq_size in text.frequency_spectrum.items()))
 
 
 def evenness(text):
@@ -199,7 +200,7 @@ def evenness(text):
     (https://en.wikipedia.org/wiki/Entropy_(information_theory))
 
     """
-    return entropy(text) / math.log(text.vocabulary_size)
+    return entropy(text) / math.log2(text.vocabulary_size)
 
 
 def yule_k(text):
@@ -243,7 +244,8 @@ def hdd(text, sample_size=42):
     381–392. https://doi.org/10.3758/BRM.42.2.381.
 
     """
-    return sum(((1 - scipy.stats.hypergeom.pmf(0, text.text_length, freq_size, sample_size)) / sample_size for freq, freq_size in text.frequency_spectrum.items()))
+    # return sum(((1 - scipy.stats.hypergeom.pmf(0, text.text_length, freq_size, sample_size)) / sample_size for freq, freq_size in text.frequency_spectrum.items()))
+    return sum(((1 - utils.hypergeom_pmf(0, text.text_length, freq_size, sample_size)) / sample_size for freq, freq_size in text.frequency_spectrum.items()))
 
 
 # -------------------------------- #
@@ -313,14 +315,14 @@ def average_token_length(text):
 def _gries_dp(text, n_parts):
     part_size = text.text_length // n_parts
     s_percentage_of_part = 1 / n_parts
-    f_overall_frequency = collections.Counter()
-    v_frequency_corpus_part = []
+    frequencies = np.zeros((text.vocabulary_size, n_parts))
+    word_idx = {t: i for i, t in enumerate(sorted(set(text.tokens)))}
     for i in range(n_parts):
         part = text.tokens[i * part_size:(i * part_size) + part_size]
-        v_frequency_corpus_part.append(collections.Counter(part))
-    for v in v_frequency_corpus_part:
-        f_overall_frequency.update(v)
-    dp_scores = {token: sum([abs(v[token] / frequency - s_percentage_of_part) for v in v_frequency_corpus_part]) / 2 for token, frequency in f_overall_frequency.items()}
+        for token, freq in collections.Counter(part).items():
+            frequencies[word_idx[token], i] = freq
+    # dp_scores = {token: sum([abs(v[token] / frequency - s_percentage_of_part) for v in v_frequency_corpus_part]) / 2 for token, frequency in f_overall_frequency.items()}
+    dp_scores = np.sum(np.absolute(np.subtract(np.divide(frequencies, np.sum(frequencies, axis=1).reshape(-1, 1)), s_percentage_of_part)), axis=1)
     return dp_scores
 
 
@@ -334,7 +336,8 @@ def gries_dp(text, n_parts):
 
     """
     dp_scores = _gries_dp(text, n_parts)
-    return statistics.mean(dp_scores.values())
+    # return statistics.mean(dp_scores.values())
+    return np.mean(dp_scores)
 
 
 def gries_dp_norm(text, n_parts):
@@ -352,8 +355,10 @@ def gries_dp_norm(text, n_parts):
 
     """
     dp_scores = _gries_dp(text, n_parts)
-    dp_norm_scores = {token: score / (1 - (1 / n_parts)) for token, score in dp_scores.items()}
-    return statistics.mean(dp_norm_scores.values())
+    # dp_norm_scores = {token: score / (1 - (1 / n_parts)) for token, score in dp_scores.items()}
+    # return statistics.mean(dp_norm_scores.values())
+    dp_norm_scores = np.divide(dp_scores, (1 - (1 / n_parts)))
+    return np.mean(dp_norm_scores)
 
 
 def kl_divergence(text, n_parts):
@@ -368,15 +373,19 @@ def kl_divergence(text, n_parts):
 
     """
     part_size = text.text_length // n_parts
-    f_overall_frequency = collections.Counter()
-    v_frequency_corpus_part = []
+    frequencies = np.zeros((text.vocabulary_size, n_parts))
+    word_idx = {t: i for i, t in enumerate(sorted(set(text.tokens)))}
     for i in range(n_parts):
         part = text.tokens[i * part_size:(i * part_size) + part_size]
-        v_frequency_corpus_part.append(collections.Counter(part))
-    for v in v_frequency_corpus_part:
-        f_overall_frequency.update(v)
-    kld_scores = {token: sum([0 if v[token] == 0 else (v[token] / frequency) * math.log2((v[token] / frequency) * n_parts) for v in v_frequency_corpus_part]) for token, frequency in f_overall_frequency.items()}
-    return statistics.mean(kld_scores.values())
+        for token, freq in collections.Counter(part).items():
+            frequencies[word_idx[token], i] = freq
+    # kld_scores = {token: sum([0 if v[token] == 0 else (v[token] / frequency) * math.log2((v[token] / frequency) * n_parts) for v in v_frequency_corpus_part]) for token, frequency in f_overall_frequency.items()}
+    relative_frequencies = np.divide(frequencies, np.sum(frequencies, axis=1).reshape(-1, 1))
+    with np.errstate(divide='ignore'):
+        log = np.log2(np.multiply(relative_frequencies, n_parts))
+    log[np.isneginf(log)] = 0
+    kld_scores = np.sum(np.multiply(relative_frequencies, log), axis=1)
+    return np.mean(kld_scores)
 
 
 # ---------------------------------- #

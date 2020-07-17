@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import collections
+import functools
 import logging
 import math
 import statistics
@@ -8,7 +9,8 @@ import unicodedata
 
 import networkx
 from nltk.tree import ParentedTree
-
+import numpy
+import scipy.special
 
 Text = collections.namedtuple("Text", ["tokens", "text_length", "vocabulary_size", "frequency_spectrum"])
 
@@ -96,6 +98,21 @@ def create_text_object(tokens):
 
 def confidence_interval(results):
     return 1.96 * statistics.stdev(results) / math.sqrt(len(results))
+
+
+@functools.lru_cache(maxsize=1024)
+def betaln(a, b):
+    return scipy.special.betaln(a, b)
+
+
+@functools.lru_cache(maxsize=1024)
+def hypergeom_pmf(k, M, n, N):
+    tot, good = M, n
+    bad = tot - good
+    result = (betaln(good+1, 1) + betaln(bad+1, 1) + betaln(tot-N+1, N+1) -
+              betaln(k+1, good-k+1) - betaln(N-k+1, bad-N+k+1) -
+              betaln(tot+1, 1))
+    return numpy.exp(result)
 
 
 def read_jtf_sentences(f):
