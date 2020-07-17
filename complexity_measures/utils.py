@@ -49,7 +49,7 @@ def disjoint_windows(tokens, window_size, strategy="spread"):
             if n_windows > 1:
                 skip = (i * rest) // (n_windows - 1)
             else:
-                skip = 0
+                skip = rest // 2
         yield create_text_object(tokens[skip + i * window_size:(skip + i * window_size) + window_size])
 
 

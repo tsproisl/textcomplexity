@@ -473,4 +473,6 @@ def bootstrap(measure, tokens, window_size, strategy="spread", **kwargs):
     results = []
     for window in utils.disjoint_windows(tokens, window_size, strategy):
         results.append(measure(window, **kwargs))
+    if len(results) == 1:
+        return results[0], 0, results
     return statistics.mean(results), utils.confidence_interval(results), results

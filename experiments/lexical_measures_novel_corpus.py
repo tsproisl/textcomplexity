@@ -31,6 +31,8 @@ def average_moving_windows(measure, tokens, window_size, **kwargs):
     results = []
     for window in utils.moving_windows(tokens, window_size, step_size=1):
         results.append(measure(window, **kwargs))
+    if len(results) == 1:
+        return results[0], 0, results
     return statistics.mean(results), utils.confidence_interval(results), results
 
 
@@ -42,6 +44,8 @@ def analyze_text(args):
         bootstrap = average_moving_windows
     tokens = read_csv(filename, ignore_punct, lower_case)
     n_windows = len(tokens) // window_size
+    if n_windows == 0:
+        return tuple(0, ["_"] * 58)
     result_ttr = bootstrap(surface.type_token_ratio, tokens, window_size)
     type_token_ratio = result_ttr[0]
     type_token_ratio_md = statistics.median(result_ttr[2])
