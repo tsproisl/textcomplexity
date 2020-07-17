@@ -46,7 +46,10 @@ def disjoint_windows(tokens, window_size, strategy="spread"):
         elif strategy == "center":
             skip = rest // 2
         elif strategy == "spread":
-            skip = (i * rest) // (n_windows - 1)
+            if n_windows > 1:
+                skip = (i * rest) // (n_windows - 1)
+            else:
+                skip = 0
         yield create_text_object(tokens[skip + i * window_size:(skip + i * window_size) + window_size])
 
 
