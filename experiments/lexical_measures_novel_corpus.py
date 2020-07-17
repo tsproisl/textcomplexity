@@ -134,10 +134,10 @@ def main():
     n_proc = 10
     print("Use %d processes" % n_proc)
     with multiprocessing.Pool(processes=n_proc) as pool:
-        for window_size in (100, 150, 250, 500, 1000, 2500, 5000, 7500, 10000):
-            for ignore_punct in (False, True):
-                for lower_case in (False, True):
-                    for disjoint_windows in (True, False):
+        for disjoint_windows in (True, False):
+            for lower_case in (False, True):
+                for ignore_punct in (False, True):
+                    for window_size in (100, 150, 250, 500, 1000, 2500, 5000, 7500, 10000):
                         with open(os.path.join("lexical_measures_novel_corpus", "lexical_measures_%s_%d%s%s.tsv" % ("disjoint" if disjoint_windows else "moving", window_size, "-punct" if ignore_punct else "+punct", "-case" if lower_case else "+case")), mode="w", encoding="utf-8") as out:
                             out.write("\t".join(fields) + "\n")
                             filenames = [fn for fn in sorted(os.listdir(directory)) if fn.endswith(".csv")]
