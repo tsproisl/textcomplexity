@@ -301,7 +301,10 @@ def mtld(text, factor_size=0.72):
             ttr = len(types) / token_count
             factors += (1 - ttr) / (1 - factor_size)
             # factor_lengths.append(token_count)
-        return len(tokens) / factors
+        try:
+            return len(tokens) / factors
+        except ZeroDivisionError:
+            return math.nan
     forward_mtld = _mtld(text.tokens, factor_size)
     reverse_mtld = _mtld(text.tokens, factor_size, reverse=True)
     return statistics.mean((forward_mtld, reverse_mtld))
