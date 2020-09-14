@@ -6,6 +6,7 @@ import logging
 import math
 import statistics
 import unicodedata
+import warnings
 
 import networkx
 from nltk.tree import ParentedTree
@@ -38,6 +39,8 @@ def disjoint_windows(tokens, window_size, strategy="spread"):
     text_length = len(tokens)
     assert window_size <= text_length
     n_windows, rest = divmod(text_length, window_size)
+    if n_windows < 5:
+        warnings.warn("Less than five windows for text length %d and window size %d. Results might be unreliable. You might want to decrease the window size.")
     for i in range(n_windows):
         if strategy == "left":
             skip = 0
