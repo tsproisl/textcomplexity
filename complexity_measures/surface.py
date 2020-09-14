@@ -263,10 +263,11 @@ def mattr(text, window_size=1000):
     """
     ttr_values = []
     window_frequencies = collections.Counter(text.tokens[0:window_size])
-    for window_start in range(1, text.text_length - window_size + 1):
+    ttr_values.append(len(window_frequencies) / window_size)
+    for window_start in range(text.text_length - window_size):
         window_end = window_start + window_size
-        word_to_pop = text.tokens[window_start - 1]
-        word_to_push = text.tokens[window_end - 1]
+        word_to_pop = text.tokens[window_start]
+        word_to_push = text.tokens[window_end]
         window_frequencies[word_to_pop] -= 1
         window_frequencies[word_to_push] += 1
         if window_frequencies[word_to_pop] == 0:

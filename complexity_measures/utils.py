@@ -2,6 +2,7 @@
 
 import collections
 import functools
+import itertools
 import logging
 import math
 import statistics
@@ -110,6 +111,27 @@ def hypergeom_pmf(k, M, n, N):
               betaln(k+1, good-k+1) - betaln(N-k+1, bad-N+k+1) -
               betaln(tot+1, 1))
     return numpy.exp(result)
+
+
+def average_measure(measure, sentences):
+    """Calculate the measure for every sentence and return mean and
+    standard deviation.
+
+    """
+    results = [measure(s) for s in sentences]
+    return statistics.mean(results), statistics.stdev(results)
+
+
+def average_measure_and_length(measure, sentences):
+    """Calculate the measure for every sentence and return mean and
+    standard deviation of the measure and mean and standard deviation
+    of the lengths.
+
+    """
+    results = [measure(s) for s in sentences]
+    scores, lengths = zip(*results)
+    lengths = list(itertools.chain.from_iterable(lengths))
+    return statistics.mean(scores), statistics.stdev(scores), statistics.mean(lengths), statistics.stdev(lengths)
 
 
 def read_jtf_sentences(f):
