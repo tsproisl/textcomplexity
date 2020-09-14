@@ -13,7 +13,7 @@ from nltk.tree import ParentedTree
 import numpy
 import scipy.special
 
-Text = collections.namedtuple("Text", ["tokens", "text_length", "vocabulary_size", "frequency_spectrum"])
+from complexity_measures.text import Text
 
 
 def disjoint_windows(tokens, window_size, strategy="spread"):
@@ -53,7 +53,7 @@ def disjoint_windows(tokens, window_size, strategy="spread"):
                 skip = (i * rest) // (n_windows - 1)
             else:
                 skip = rest // 2
-        yield create_text_object(tokens[skip + i * window_size:(skip + i * window_size) + window_size])
+        yield Text.from_tokens(tokens[skip + i * window_size:(skip + i * window_size) + window_size])
 
 
 def moving_windows(tokens, window_size, step_size=1):
@@ -91,15 +91,6 @@ def moving_windows(tokens, window_size, step_size=1):
                     frequency_spectrum[f_old_1] += 1
                 vocabulary_size = len(frequencies)
         yield Text(list(deque), window_size, vocabulary_size, dict(frequency_spectrum))
-
-
-def create_text_object(tokens):
-    """Return text length, vocabulary size and the frequency spectrum."""
-    text_length = len(tokens)
-    frequency_list = collections.Counter(tokens)
-    vocabulary_size = len(frequency_list)
-    frequency_spectrum = dict(collections.Counter(frequency_list.values()))
-    return Text(tokens, text_length, vocabulary_size, frequency_spectrum)
 
 
 def confidence_interval(results):
