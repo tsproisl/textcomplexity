@@ -5,40 +5,7 @@ import statistics
 
 import networkx
 
-from complexity_measures import utils
-
-
-# -----------------
-#  Sentence length
-# -----------------
-def sentence_length_words(sentence_graphs):
-    """Mean sentence length in words; also returns the standard
-    deviation.
-
-    """
-    return utils.average_measure(_sentence_length_words, sentence_graphs)
-
-
-def _sentence_length_words(g):
-    """Sentence length in words."""
-    return len(g)
-
-
-def sentence_length_characters(sentence_graphs):
-    """Mean sentence length in characters; also returns the standard
-    deviation. Sentence length in characters is the sum of token
-    lengths plus number of token boundaries, i.e. we assume a space
-    between all tokens.
-
-    """
-    return utils.average_measure(_sentence_length_characters, sentence_graphs)
-
-
-def _sentence_length_characters(g):
-    """Sentence length in characters."""
-    tokens = [l["token"] for v, l in g.nodes(data=True)]
-    token_lengths = [len(t) for t in tokens]
-    return sum(token_lengths) + len(token_lengths) - 1
+from complexity_measures.utils import misc
 
 
 # ---------------------
@@ -46,7 +13,7 @@ def _sentence_length_characters(g):
 # ---------------------
 def average_dependency_distance(sentence_graphs):
     """Oya (2011)"""
-    return utils.average_measure(_average_dependency_distance, sentence_graphs)
+    return misc.average_measure(_average_dependency_distance, sentence_graphs)
 
 
 def _average_dependency_distance(g):
@@ -75,7 +42,7 @@ def closeness_centrality(sentence_graphs):
     vertices. Used by Oya (2012).
 
     """
-    return utils.average_measure(_closeness_centrality, sentence_graphs)
+    return misc.average_measure(_closeness_centrality, sentence_graphs)
 
 
 def _closeness_centrality(g):
@@ -86,7 +53,7 @@ def _closeness_centrality(g):
     """
     if len(g) > 1:
         root = [v for v, l in g.nodes(data=True) if "root" in l][0]
-        return networkx.algorithms.centrality.closeness_centrality(g, root, reverse=True)
+        return networkx.algorithms.centrality.closeness_centrality(g.reverse(), root)
     else:
         return 1
 
@@ -100,7 +67,7 @@ def outdegree_centralization(sentence_graphs):
     dependent on the root vertex. Used by Oya (2012).
 
     """
-    return utils.average_measure(_outdegree_centralization, sentence_graphs)
+    return misc.average_measure(_outdegree_centralization, sentence_graphs)
 
 
 def _outdegree_centralization(g):
@@ -130,7 +97,7 @@ def closeness_centralization(sentence_graphs):
     dependent on the root vertex. Used by Oya (2012).
 
     """
-    return utils.average_measure(_closeness_centralization, sentence_graphs)
+    return misc.average_measure(_closeness_centralization, sentence_graphs)
 
 
 def _closeness_centralization(g):
@@ -140,7 +107,7 @@ def _closeness_centralization(g):
 
     """
     if len(g) > 1:
-        cc = networkx.algorithms.centrality.closeness_centrality(g, reverse=True).values()
+        cc = networkx.algorithms.centrality.closeness_centrality(g.reverse()).values()
         max_cc = max(cc)
         # for directed graphs, the denominator should be n - 1
         # instead of (n² - 3n + 2)/(2n - 3)
@@ -159,7 +126,7 @@ def longest_shortest_path(sentence_graphs):
     tree.
 
     """
-    return utils.average_measure(_longest_shortest_path, sentence_graphs)
+    return misc.average_measure(_longest_shortest_path, sentence_graphs)
 
 
 def _longest_shortest_path(g):
@@ -178,38 +145,10 @@ def _longest_shortest_path(g):
 #  Dependents per word
 # ---------------------
 def dependents_per_word(sentence_graphs):
-    return utils.average_measure(_dependents_per_word, sentence_graphs)
+    return misc.average_measure(_dependents_per_word, sentence_graphs)
 
 
 def _dependents_per_word(g):
     """Average number of dependents per word."""
     outdegrees = [deg for v, deg in g.out_degree()]
     return statistics.mean(outdegrees)
-
-
-# -------------
-#  Punctuation
-# -------------
-def punctuation_per_sentence(sentence_graphs, punctuation):
-    """Number of punctuation tokens per sentence (according to
-    `punctuation`, a set of part-of-speech tags).
-
-    """
-    pps = functools.partial(_punctuation_per_sentence, punctuation=punctuation)
-    return utils.average_measure(pps, sentence_graphs)
-
-
-def _punctuation_per_sentence(g, punctuation):
-    return len([v for v, l in g.nodes(data=True) if l["pos"] in punctuation])
-
-
-def punctuation_per_token(sentence_graphs, punctuation):
-    """Number of punctuation tokens per token (according to `punctuation`,
-    a set of part-of-speech tags).
-
-    """
-    punct, tokens = 0, 0
-    for g in sentence_graphs:
-        punct += _punctuation_per_sentence(g, punctuation)
-        tokens += len(g)
-    return punct / tokens

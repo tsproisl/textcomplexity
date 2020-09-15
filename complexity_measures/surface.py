@@ -10,7 +10,7 @@ import scipy.optimize
 import scipy.stats
 
 from complexity_measures import utils
-
+from complexity_measures.utils import misc, windows
 
 # ------------------------------------------------- #
 # MEASURES THAT USE SAMPLE SIZE AND VOCABULARY SIZE #
@@ -245,7 +245,7 @@ def hdd(text, sample_size=42):
 
     """
     # return sum(((1 - scipy.stats.hypergeom.pmf(0, text.text_length, freq_size, sample_size)) / sample_size for freq, freq_size in text.frequency_spectrum.items()))
-    return sum(((1 - utils.hypergeom_pmf(0, text.text_length, freq_size, sample_size)) / sample_size for freq, freq_size in text.frequency_spectrum.items()))
+    return sum(((1 - misc.hypergeom_pmf(0, text.text_length, freq_size, sample_size)) / sample_size for freq, freq_size in text.frequency_spectrum.items()))
 
 
 # -------------------------------- #
@@ -475,8 +475,8 @@ def bootstrap(measure, tokens, window_size, strategy="spread", **kwargs):
 
     """
     results = []
-    for window in utils.disjoint_windows(tokens, window_size, strategy):
+    for window in windows.disjoint_windows(tokens, window_size, strategy):
         results.append(measure(window, **kwargs))
     if len(results) == 1:
         return results[0], 0, results
-    return statistics.mean(results), utils.confidence_interval(results), results
+    return statistics.mean(results), misc.confidence_interval(results), results

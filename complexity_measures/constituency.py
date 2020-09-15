@@ -3,11 +3,11 @@
 import nltk
 import nltk_tgrep
 
-from complexity_measures import utils
+from complexity_measures.utils import misc
 
 
 def t_units(trees):
-    return utils.average_measure_and_length(_t_units, trees)
+    return misc.average_measure_and_length(_t_units, trees)
 
 
 def _t_units(tree):
@@ -24,7 +24,7 @@ def _t_units(tree):
 
 
 def complex_t_units(trees):
-    return utils.average_measure_and_length(_complex_t_units, trees)
+    return misc.average_measure_and_length(_complex_t_units, trees)
 
 
 def _complex_t_units(tree):
@@ -38,7 +38,7 @@ def _complex_t_units(tree):
 
 
 def clauses(trees):
-    return utils.average_measure_and_length(_clauses, trees)
+    return misc.average_measure_and_length(_clauses, trees)
 
 
 def _clauses(tree):
@@ -54,7 +54,7 @@ def _clauses(tree):
 
 
 def dependent_clauses(trees):
-    return utils.average_measure_and_length(_dependent_clauses, trees)
+    return misc.average_measure_and_length(_dependent_clauses, trees)
 
 
 def _dependent_clauses(tree):
@@ -63,7 +63,7 @@ def _dependent_clauses(tree):
 
 
 def nps(trees):
-    return utils.average_measure_and_length(_nps, trees)
+    return misc.average_measure_and_length(_nps, trees)
 
 
 def _nps(tree):
@@ -72,7 +72,7 @@ def _nps(tree):
 
 
 def vps(trees):
-    return utils.average_measure_and_length(_vps, trees)
+    return misc.average_measure_and_length(_vps, trees)
 
 
 def _vps(tree):
@@ -81,7 +81,7 @@ def _vps(tree):
 
 
 def pps(trees):
-    return utils.average_measure_and_length(_pps, trees)
+    return misc.average_measure_and_length(_pps, trees)
 
 
 def _pps(tree):
@@ -90,7 +90,7 @@ def _pps(tree):
 
 
 def coordinate_phrases(trees):
-    return utils.average_measure_and_length(_coordinate_phrases, trees)
+    return misc.average_measure_and_length(_coordinate_phrases, trees)
 
 
 def _coordinate_phrases(tree):
@@ -102,7 +102,7 @@ def _coordinate_phrases(tree):
 
 
 def constituents(trees):
-    return utils.average_measure(_constituents, trees)
+    return misc.average_measure(_constituents, trees)
 
 
 def _constituents(tree):
@@ -111,7 +111,7 @@ def _constituents(tree):
 
 
 def constituents_wo_leaves(trees):
-    return utils.average_measure(_constituents_wo_leaves, trees)
+    return misc.average_measure(_constituents_wo_leaves, trees)
 
 
 def _constituents_wo_leaves(tree):
@@ -120,7 +120,7 @@ def _constituents_wo_leaves(tree):
 
 
 def height(trees):
-    return utils.average_measure(_height, trees)
+    return misc.average_measure(_height, trees)
 
 
 def _height(tree):

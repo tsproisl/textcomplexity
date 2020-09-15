@@ -4,9 +4,10 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from complexity_measures import surface, text, utils
+from complexity_measures import surface, text
+from complexity_measures.utils import windows
 
 
 class TestMattr(unittest.TestCase):
@@ -31,8 +32,8 @@ class TestMattr(unittest.TestCase):
              'j', 'c', 'a', 'j', 'c', 'h', 'i', 'a', 'f', 'c', 'j', 'g', 'd',
              'e', 'f', 'a', 'c', 'i', 'g', 'c', 'a', 'g', 'b', 'a', 'f', 'e',
              'd', 'g', 'f', 'd', 'b', 'b', 'j', 'e', 'e']
-        windows = utils.moving_windows(b, 10)
-        results = [surface.type_token_ratio(w) for w in windows]
+        wins = windows.moving_windows(b, 10)
+        results = [surface.type_token_ratio(w) for w in wins]
         mean = sum(results) / len(results)
         b = text.Text.from_tokens(b)
         self.assertAlmostEqual(surface.mattr(b, 10), mean, places=10)
