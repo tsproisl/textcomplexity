@@ -9,8 +9,8 @@ import numpy as np
 import scipy.optimize
 import scipy.stats
 
-from complexity_measures import utils
 from complexity_measures.utils import misc, windows
+
 
 # ------------------------------------------------- #
 # MEASURES THAT USE SAMPLE SIZE AND VOCABULARY SIZE #
