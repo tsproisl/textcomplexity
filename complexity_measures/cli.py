@@ -19,6 +19,8 @@ def arguments():
     parser.add_argument("--sent", action="store_true", help="Compute sentence-based complexity measures")
     parser.add_argument("--dep", action="store_true", help="Compute dependency-based complexity measures")
     parser.add_argument("--const", action="store_true", help="Compute constituent-based complexity measures")
+    parser.add_argument("--all-measures", action="store_true", help="Compute ALL applicable complexity measures (instead of only a sensible subset)")
+    parser.add_argument("--lang", choices=["de_negra", "none"], default="none", help="Input language and parsing scheme. Some constituent-based complexity measures are only defined for certain languages or parsing schemes. Default: none (i.e. only compute language-independent measures).")
     parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation (currently only implemented for surface-based complexity measures)")
     parser.add_argument("--punct-tag", action="append", help="Part-of-speech tag used for punctuation. Can be used multiple times to specify multiple tags, e.g. --punct-tag $. --punct-tag $, (Default: --punct-tag PUNCT)")
     parser.add_argument("--window-size", default=1000, type=int, help="Window size for vocabulary-based complexity measures (default: 1000)")
@@ -28,34 +30,35 @@ def arguments():
     return parser.parse_args()
 
 
-def surface_based(tokens, window_size):
+def surface_based(tokens, window_size, all_measures):
     """"""
     results = []
-    measures = [(surface.type_token_ratio, "type-token ratio"),
-                # (surface.guiraud_r, "Guiraud's R"),
-                # (surface.herdan_c, "Herdan's C"),
-                # (surface.dugast_k, "Dugast's k"),
-                # (surface.maas_a2, "Maas' a²"),
-                # (surface.dugast_u, "Dugast's U"),
-                # (surface.tuldava_ln, "Tuldava's LN"),
-                # (surface.brunet_w, "Brunet's W"),
-                # (surface.cttr, "CTTR"),
-                # (surface.summer_s, "Summer's S"),
-                (surface.sichel_s, "Sichel's S"),
-                # (surface.michea_m, "Michéa's M"),
-                (surface.honore_h, "Honoré's H"),
-                (surface.entropy, "Entropy"),
-                (surface.evenness, "Evenness"),
-                # (surface.yule_k, "Yule's K"),
-                (surface.simpson_d, "Simpson's D"),
-                # (surface.herdan_vm, "Herdan's Vm"),
-                (surface.hdd, "HD-D"),
-                (surface.average_token_length, "average token length"),
-                (surface.orlov_z, "Orlov's Z")]
-    for measure, name in measures:
-        name += " (disjoint windows)"
-        mean, stdev, _ = surface.bootstrap(measure, tokens, window_size, strategy="spread")
-        results.append(Result(name, mean, stdev, None, None))
+    measures = [(surface.type_token_ratio, "type-token ratio", True),
+                (surface.guiraud_r, "Guiraud's R", False),
+                (surface.herdan_c, "Herdan's C", False),
+                (surface.dugast_k, "Dugast's k", False),
+                (surface.maas_a2, "Maas' a²", False),
+                (surface.dugast_u, "Dugast's U", False),
+                (surface.tuldava_ln, "Tuldava's LN", False),
+                (surface.brunet_w, "Brunet's W", False),
+                (surface.cttr, "CTTR", False),
+                (surface.summer_s, "Summer's S", False),
+                (surface.sichel_s, "Sichel's S", True),
+                (surface.michea_m, "Michéa's M", False),
+                (surface.honore_h, "Honoré's H", True),
+                (surface.entropy, "Entropy", True),
+                (surface.evenness, "Evenness", True),
+                (surface.yule_k, "Yule's K", False),
+                (surface.simpson_d, "Simpson's D", True),
+                (surface.herdan_vm, "Herdan's Vm", False),
+                (surface.hdd, "HD-D", True),
+                (surface.average_token_length, "average token length", True),
+                (surface.orlov_z, "Orlov's Z", True)]
+    for measure, name, subset in measures:
+        if all_measures or subset:
+            name += " (disjoint windows)"
+            mean, stdev, _ = surface.bootstrap(measure, tokens, window_size, strategy="spread")
+            results.append(Result(name, mean, stdev, None, None))
     text = Text.from_tokens(tokens)
     mattr = surface.mattr(text, window_size)
     results.append(Result("type-token ratio (moving windows)", mattr, None, None, None))
@@ -94,7 +97,7 @@ def dependency_based(graphs):
     return results
 
 
-def constituency_based(trees):
+def constituency_based(trees, lang):
     """"""
     results = []
     measures_with_length = [(constituency.t_units, "t-units"),
@@ -108,9 +111,10 @@ def constituency_based(trees):
     measures_wo_length = [(constituency.constituents, "constituents"),
                           (constituency.constituents_wo_leaves, "non-terminal constituents"),
                           (constituency.height, "parse tree height")]
-    for measure, name in measures_with_length:
-        value, stdev, length, length_sd = measure(trees)
-        results.append(Result(name, value, stdev, length, length_sd))
+    if lang == "de_negra":
+        for measure, name in measures_with_length:
+            value, stdev, length, length_sd = measure(trees)
+            results.append(Result(name, value, stdev, length, length_sd))
     for measure, name in measures_wo_length:
         value, stdev = measure(trees)
         results.append(Result(name, value, stdev, None, None))
@@ -140,13 +144,13 @@ def main():
             tokens = list(itertools.chain.from_iterable(tokens))
         results = []
         if args.sur and tokens is not None:
-            results.extend(surface_based(tokens, args.window_size))
+            results.extend(surface_based(tokens, args.window_size, args.all_measures))
         if args.sent and tagged is not None:
             results.extend(sentence_based(tagged, punct_tags))
         if args.dep and graphs is not None:
             results.extend(dependency_based(graphs))
         if args.const and ps_trees is not None:
-            results.extend(constituency_based(ps_trees))
+            results.extend(constituency_based(ps_trees, args.lang))
         all_results[f.name] = {}
         for r in results:
             all_results[f.name][r.name] = {"value": r.value}
