@@ -75,20 +75,51 @@ an underscore (`_`). Here is a short example with two sentences:
     4	es	PPER	3	OA	*
     5	.	$.	4	--	*))
 
-Without any further options, the script computes all applicable
-measures:
+Without any further options, the script computes a sensible subset of
+all applicable measures (see below):
 
     lascomplexity.py --input-format conllu <file>
 
-You can also request subsets of the measures via the `--sur`, `--sent`
-`--dep` and `--const` options for surface-based, sentence-based,
-dependency-based and constituent-based measures. By default, the
-script formats its output as JSON but you can also request
-tab-separated values suitable for import in a spreadsheet
-(`--output-format tsv`). More detailed usage information is available
-via:
+If you want to compute all applicable measures (including measures
+that are perfectly correlated with other measures), you can use the
+option `--all-measures`. You can also request specific subsets of the
+measures via the `--sur`, `--sent` `--dep` and `--const` options for
+surface-based, sentence-based, dependency-based and constituent-based
+measures. By default, the script formats its output as JSON but you
+can also request tab-separated values suitable for import in a
+spreadsheet (`--output-format tsv`). More detailed usage information
+is available via:
 
     lascomplexity.py -h
+
+### Utility scripts: From raw text to CONLL-U
+
+Getting the input format right can sometimes be a bit tricky.
+Therefore, we provide simple wrapper scripts around two
+state-of-the-art NLP pipelines,
+[stanza](https://stanfordnlp.github.io/stanza/) and
+[spaCy](https://spacy.io/). You can find the scripts in the `utils/`
+subdirectory of this repository.
+
+#### stanza
+
+First, you need to install stanza:
+
+    pip install stanza
+
+Now you can use the wrapper script to parse your text files:
+
+    run_stanza.py --language <language> --output-dir <directory> <file> …
+
+#### spaCy
+
+First, you need to install spaCy:
+
+    pip install -U spacy spacy-lookups-data
+
+Now you can use the wrapper script to parse your text files:
+
+    run_stanza.py --language <language> --output-dir <directory> <file> …
 
 ## Complexity measures
 
