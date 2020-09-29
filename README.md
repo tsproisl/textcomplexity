@@ -107,7 +107,9 @@ via:
   * Carroll's CTTR
   * Summer's S
 
-All of these measures correlate perfectly.
+All of these measures correlate perfectly. Therefore, the default
+setting is to only compute the type-token ratio. If you want to
+compute all of these measures, use the option `--all-measures`.
 
 #### Measures that use part of the frequency spectrum
 
@@ -115,7 +117,9 @@ All of these measures correlate perfectly.
   * Michéa's M
   * Honoré's H
 
-Michéa's M is simply the reciprocal of Sichel's S.
+Michéa's M is simply the reciprocal of Sichel's S, therefore we only
+compute Sichel's S by default. If you want to compute Michéa's M as
+well, use the option `--all-measures`.
 
 #### Measures that use the whole frequency spectrum
 
@@ -127,6 +131,10 @@ Michéa's M is simply the reciprocal of Sichel's S.
   * McCarthy and Jarvis' HD-D
 
 Yule's K, Simpson's D and Herdan's V<sub>m</sub> correlate perfectly.
+Therefore, the default setting is to only compute Simpson's D (which
+can be interpreted as the probability of two randomly drawn tokens
+from the text being identical). If you also want to compute Yule's K
+and Herdan's V<sub>m</sub>, use the option `--all-measures`.
 
 #### Parameters of probabilistic models
 
@@ -137,11 +145,13 @@ Yule's K, Simpson's D and Herdan's V<sub>m</sub> correlate perfectly.
   * Covington and McFall's MATTR
   * MTLD
   * Kubat and Milicka's STTR
+  * Average token length
   * Gries' DP and DP<sub>norm</sub>
   * Kullback-Leibler divergence
-  * Average token length
 
-DP/DP<sub>norm</sub> and KL-divergence are measures of dispersion.
+DP/DP<sub>norm</sub> and KL-divergence are measures of dispersion. As
+they require an additional parameter (the number of parts in which to
+split the text), they are not computed in the command-line script.
 
 ### Sentence-based complexity measures
 
