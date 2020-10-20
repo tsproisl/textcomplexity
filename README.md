@@ -8,27 +8,27 @@ independent, but most rely on the [NEGRA parsing
 scheme](http://www.coli.uni-saarland.de/projects/sfb378/negra-corpus/knoten.html),
 i.e. can only be applied to German data.
 
-<!-- ## Installation -->
+## Installation
 
-<!-- The easiest way to install the toolbox is via pip (pip3 in some -->
-<!-- distributions): -->
+The easiest way to install the toolbox is via pip (pip3 in some
+distributions):
 
-<!--     pip install foo -->
+    pip install textcomplexity
 
-<!-- Alternatively, you can download and decompress the [latest -->
-<!-- release](https://github.com/tsproisl/Linguistic_and_Stylistic_Complexity/releases/latest) -->
-<!-- or clone the git repository: -->
+Alternatively, you can download and decompress the [latest
+release](https://github.com/tsproisl/textcomplexity/releases/latest)
+or clone the git repository:
 
-<!--     git clone https://github.com/tsproisl/Linguistic_and_Stylistic_Complexity.git -->
+    git clone https://github.com/tsproisl/textcomplexity.git
 
-<!-- In the new directory, run the following command: -->
+In the new directory, run the following command:
 
-<!--     python3 setup.py install -->
+    python3 setup.py install
 
 
 ## Usage
 
-You can use the script `bin/lascomplexity.py` to compute (a sensible
+You can use the script `bin/txtcomplexity` to compute (a sensible
 subset of) all implemented complexity measures from the command line.
 The script currently supports two input formats: The widely used
 [CoNLL-U format](https://universaldependencies.org/format.html)
@@ -78,7 +78,7 @@ an underscore (`_`). Here is a short example with two sentences:
 Without any further options, the script computes a sensible subset of
 all applicable measures (see below):
 
-    lascomplexity.py --input-format conllu <file>
+    txtcomplexity --input-format conllu <file>
 
 If you want to compute all applicable measures (including measures
 that are perfectly correlated with other measures), you can use the
@@ -90,7 +90,7 @@ can also request tab-separated values suitable for import in a
 spreadsheet (`--output-format tsv`). More detailed usage information
 is available via:
 
-    lascomplexity.py -h
+    txtcomplexity -h
 
 ### Utility scripts: From raw text to CONLL-U
 
