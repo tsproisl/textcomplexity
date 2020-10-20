@@ -2,7 +2,7 @@
 
 import logging
 
-import complexity_measures.cli
+import textcomplexity.cli
 
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)

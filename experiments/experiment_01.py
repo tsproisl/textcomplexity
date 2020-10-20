@@ -8,7 +8,7 @@ import regex as re
 import statistics
 import warnings
 
-from complexity_measures import vocabulary_richness
+from textcomplexity import vocabulary_richness
 
 
 def read_directory_gutenberg(directoryname, metadatafile, yearfile, filter_punctuation=False):

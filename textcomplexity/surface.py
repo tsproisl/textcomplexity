@@ -9,7 +9,7 @@ import numpy as np
 import scipy.optimize
 import scipy.stats
 
-from complexity_measures.utils import misc, windows
+from textcomplexity.utils import misc, windows
 
 
 # ------------------------------------------------- #

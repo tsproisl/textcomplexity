@@ -6,9 +6,9 @@ import logging
 import os
 import statistics
 
-from complexity_measures import dependency_based
-from complexity_measures import vocabulary_richness
-from complexity_measures import utils
+from textcomplexity import dependency_based
+from textcomplexity import vocabulary_richness
+from textcomplexity import utils
 
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)

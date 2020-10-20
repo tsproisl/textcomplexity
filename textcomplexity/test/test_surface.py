@@ -6,8 +6,8 @@ import unittest
 
 # sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from complexity_measures import surface, text
-from complexity_measures.utils import windows
+from textcomplexity import surface, text
+from textcomplexity.utils import windows
 
 
 class TestMattr(unittest.TestCase):

@@ -6,9 +6,9 @@ import functools
 import itertools
 import json
 
-from complexity_measures import surface, sentence, dependency, constituency
-from complexity_measures.text import Text
-from complexity_measures.utils import conllu, custom_tsv
+from textcomplexity import surface, sentence, dependency, constituency
+from textcomplexity.text import Text
+from textcomplexity.utils import conllu, custom_tsv
 
 Result = collections.namedtuple("Result", ["name", "value", "stdev", "length", "length_stdev"])
 

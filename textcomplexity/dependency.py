@@ -5,7 +5,7 @@ import statistics
 
 import networkx
 
-from complexity_measures.utils import misc
+from textcomplexity.utils import misc
 
 
 # ---------------------

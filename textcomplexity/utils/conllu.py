@@ -6,7 +6,7 @@ import re
 
 import networkx
 
-from complexity_measures.utils import graph
+from textcomplexity.utils import graph
 
 UdToken = collections.namedtuple("UdToken", "id form lemma upos xpos feats head deprel deps misc".split())
 Token = collections.namedtuple("Token", "word pos".split())

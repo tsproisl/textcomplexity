@@ -8,7 +8,7 @@ import psutil
 import statistics
 import unicodedata
 
-from complexity_measures import surface, utils
+from textcomplexity import surface, utils
 
 # window sizes: 100, 150, 250, 500, 1000, 2500, 5000, 7500, 10000
 # +/- punctuation

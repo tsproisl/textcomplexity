@@ -3,7 +3,7 @@
 import nltk
 import nltk_tgrep
 
-from complexity_measures.utils import misc
+from textcomplexity.utils import misc
 
 
 def t_units(trees):

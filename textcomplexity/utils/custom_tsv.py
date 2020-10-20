@@ -6,7 +6,7 @@ import logging
 import networkx
 from nltk.tree import ParentedTree
 
-from complexity_measures.utils import graph
+from textcomplexity.utils import graph
 
 TsvToken = collections.namedtuple("TsvToken", "id word pos head deprel pstree".split())
 Token = collections.namedtuple("Token", "word pos".split())

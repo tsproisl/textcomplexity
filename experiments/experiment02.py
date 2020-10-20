@@ -2,8 +2,8 @@
 
 import pandas as pd
 
-from complexity_measures import dependency_based
-from complexity_measures import utils
+from textcomplexity import dependency_based
+from textcomplexity import utils
 
 
 def main():

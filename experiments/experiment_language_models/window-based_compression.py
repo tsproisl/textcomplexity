@@ -4,7 +4,7 @@ import argparse
 import itertools
 import os
 
-from complexity_measures import compression, utils
+from textcomplexity import compression, utils
 
 
 def arguments():

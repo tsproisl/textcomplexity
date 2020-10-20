@@ -2,8 +2,8 @@
 
 import pandas as pd
 
-from complexity_measures import vocabulary_richness
-from complexity_measures import utils
+from textcomplexity import vocabulary_richness
+from textcomplexity import utils
 
 
 def main():

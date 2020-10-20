@@ -2,7 +2,7 @@
 
 import unittest
 
-from complexity_measures.utils import windows
+from textcomplexity.utils import windows
 
 
 class TestDisjointWindows(unittest.TestCase):

@@ -4,7 +4,7 @@ import collections
 
 import pandas as pd
 
-from complexity_measures import utils
+from textcomplexity import utils
 
 
 def main():
