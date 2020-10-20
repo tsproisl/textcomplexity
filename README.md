@@ -1,5 +1,7 @@
 # Linguistic and Stylistic Complexity
 
+[![PyPI](https://img.shields.io/pypi/v/textcomplexity)](https://pypi.org/project/textcomplexity/)
+
 This project implements various measures that assess the linguistic
 and stylistic complexity of (literary) texts. All surface-based,
 sentence-based and dependency-based complexity measures are language
