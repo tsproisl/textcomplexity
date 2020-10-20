@@ -63,7 +63,7 @@ def _read_conllu(f):
             sentence = []
             origid = ""
         else:
-            fields = line.split()
+            fields = line.split("\t")
             sentence.append(UdToken(*fields))
     if len(sentence) > 0:
         yield sentence, origid
