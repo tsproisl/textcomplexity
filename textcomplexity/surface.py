@@ -101,7 +101,7 @@ def tuldava_ln(text):
     return (1 - (text.vocabulary_size ** 2)) / ((text.vocabulary_size ** 2) * math.log(text.text_length))
 
 
-def brunet_w(text, *, a=-0.172):
+def brunet_w(text, *, a=0.172):
     """Brunet (1978)
 
     Brunet, Étienne (1978). Le vocabulaire de Jean Giraudoux.
