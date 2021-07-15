@@ -34,7 +34,7 @@ def read_tsv_sentences(f, *, ignore_punct=False, punct_tags=None, warnings=True)
             id_to_enumeration = {t.id: i for i, t in enumerate(sentence)}
             for i, token in enumerate(sentence):
                 if token.head == "-1":
-                    g.node[i]["root"] = "root"
+                    g.nodes[i]["root"] = "root"
                 else:
                     g.add_edge(id_to_enumeration[token.head], i, relation=token.deprel)
             sensible, explanation = graph.is_sensible_graph(g)
