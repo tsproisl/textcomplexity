@@ -37,7 +37,7 @@ The script currently supports two input formats: The widely used
 (`--input-format conllu`) and a custom tab-separated input format
 (`--input-format tsv`).
 
-The CoNLL-U format consists of ten tab-separated columns that encode,
+The **CoNLL-U format** consists of ten tab-separated columns that encode,
 among other things, the dependency structure of the sentence. Missing
 values can be represented by an underscore (`_`). Here is an example:
 
@@ -57,11 +57,12 @@ values can be represented by an underscore (`_`). Here is an example:
     12	.	.	PUNCT	$.	_	11	punct	_	_
 
 If you want to compute the constituency-based complexity measures, the
-input should be CoNLL-style text files with six tab-separated columns
-and an empty line after each sentence. The six columns are: word
-index, word, part-of-speech tag, index of dependency head, dependency
-relation, phrase structure tree. Missing values can be represented by
-an underscore (`_`). Here is a short example with two sentences:
+input should be in a **custom tab-separated format** with six
+tab-separated columns and an empty line after each sentence. The six
+columns are: word index, word, part-of-speech tag, index of dependency
+head, dependency relation, phrase structure tree. Missing values can
+be represented by an underscore (`_`). Here is a short example with
+two sentences:
 
     1	Das	ART	3	NK	(TOP(S(NP*
     2	fremde	ADJA	3	NK	*
