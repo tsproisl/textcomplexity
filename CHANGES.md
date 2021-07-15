@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version ???
+
+  - Improve warning about window size.
+
 ## Version 0.9.1, 2021-07-15
 
   - Bugfix: Use 0.172 instead of -0.172 as default value for alpha in

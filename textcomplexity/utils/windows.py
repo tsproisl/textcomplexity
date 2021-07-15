@@ -30,7 +30,7 @@ def disjoint_windows(tokens, window_size, strategy="spread"):
     assert window_size <= text_length
     n_windows, rest = divmod(text_length, window_size)
     if n_windows < 5:
-        warnings.warn("Less than five windows for text length %d and window size %d. Results might be unreliable. You might want to decrease the window size.")
+        warnings.warn(f"Less than five windows for text length {text_length} and window size {window_size}. Results might be unreliable. You might want to decrease the window size.")
     for i in range(n_windows):
         if strategy == "left":
             skip = 0
