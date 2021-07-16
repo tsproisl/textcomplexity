@@ -10,7 +10,10 @@ import stanza.resources.common
 
 
 def arguments():
-    stanza_resources = json.load(open(os.path.join(stanza.resources.common.DEFAULT_MODEL_DIR, "resources.json")))
+    stanza_resources_path = os.path.join(stanza.resources.common.DEFAULT_MODEL_DIR, "resources.json")
+    if not os.path.isfile(stanza_resources_path):
+        stanza.resources.common.download_resources_json(stanza.resources.common.DEFAULT_MODEL_DIR, stanza.resources.common.DEFAULT_RESOURCES_URL, None, stanza.resources.common.DEFAULT_RESOURCES_VERSION)
+    stanza_resources = json.load(open(stanza_resources_path))
     parser = argparse.ArgumentParser(description="Parse input texts to CONLL-U format using stanza.")
     parser.add_argument("-l", "--language", choices=sorted(stanza_resources.keys()), required=True, help="Input language.")
     parser.add_argument("-o", "--output-dir", type=os.path.abspath, default=".", help="Output directory. Default: Current directory.")
