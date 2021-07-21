@@ -385,9 +385,7 @@ def kl_divergence(text, n_parts):
             frequencies[word_idx[token], i] = freq
     # kld_scores = {token: sum([0 if v[token] == 0 else (v[token] / frequency) * math.log2((v[token] / frequency) * n_parts) for v in v_frequency_corpus_part]) for token, frequency in f_overall_frequency.items()}
     relative_frequencies = np.divide(frequencies, np.sum(frequencies, axis=1).reshape(-1, 1))
-    with np.errstate(divide='ignore'):
-        log = np.log2(np.multiply(relative_frequencies, n_parts))
-    log[np.isneginf(log)] = 0
+    log = np.log2(np.where(frequencies != 0, np.multiply(relative_frequencies, n_parts), np.ones_like(relative_frequencies)))
     kld_scores = np.sum(np.multiply(relative_frequencies, log), axis=1)
     return np.mean(kld_scores)
 
