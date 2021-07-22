@@ -28,6 +28,10 @@ def hypergeom_pmf(k, M, n, N):
     return numpy.exp(result)
 
 
+def geom_pmf(k, p):
+    return numpy.power(1-p, k-1) * p
+
+
 def average_measure(measure, sentences):
     """Calculate the measure for every sentence and return mean and
     standard deviation.
