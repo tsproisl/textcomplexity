@@ -320,7 +320,7 @@ def _gries_dp(text, n_parts):
     part_size = text.text_length // n_parts
     s_percentage_of_part = 1 / n_parts
     frequencies = np.zeros((text.vocabulary_size, n_parts))
-    word_idx = {t: i for i, t in enumerate(sorted(set(text.tokens)))}
+    word_idx = {t: i for i, t in enumerate(sorted(text.frequency_list.keys()))}
     for i in range(n_parts):
         part = text.tokens[i * part_size:(i * part_size) + part_size]
         for token, freq in collections.Counter(part).items():
@@ -378,7 +378,7 @@ def kl_divergence(text, n_parts):
     """
     part_size = text.text_length // n_parts
     frequencies = np.zeros((text.vocabulary_size, n_parts))
-    word_idx = {t: i for i, t in enumerate(sorted(set(text.tokens)))}
+    word_idx = {t: i for i, t in enumerate(sorted(text.frequency_list.keys()))}
     for i in range(n_parts):
         part = text.tokens[i * part_size:(i * part_size) + part_size]
         for token, freq in collections.Counter(part).items():
