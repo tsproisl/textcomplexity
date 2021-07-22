@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import collections
+import functools
 import math
 import operator
 import statistics
@@ -405,6 +406,54 @@ def _get_distances(text):
         dist = first[token] + text.text_length - last[token]
         distances[idx, dist - 1] += 1
     return distances
+
+
+def _distances_kld(text):
+    distances = _get_distances(text)
+    p = np.divide(distances, np.sum(distances, axis=1).reshape(-1, 1))
+    word_probs = np.array([text.frequency_list[t] / text.text_length for t in sorted(text.frequency_list.keys())])
+    # geom_pmf = functools.partial(scipy.stats.geom.pmf, np.arange(1, text.text_length + 1))
+    geom_pmf = functools.partial(misc.geom_pmf, np.arange(1, text.text_length + 1))
+    q = np.apply_along_axis(geom_pmf, 1, word_probs.reshape(-1, 1))
+    kld = np.sum(np.multiply(p, np.log2(np.where(p != 0, np.divide(p, q), np.ones_like(p)))), axis=1)
+    return kld
+
+
+def distances_wasted_bits_per_token(text):
+    """The average number of bits per token that would be wasted
+    if we encoded the observed distances between tokens of the same
+    type with a code based on the geometric distribution.
+
+    For each type, we compute the Kullback-Leibler divergence of
+    observed distances from the geometric distribution, then we take
+    the weighted mean using the relative frequencies of the types as
+    weights.
+
+    Larger scores indicate greater deviations from the geometric
+    distribution, i.e. greater non-randomness.
+
+    """
+    word_probs = np.array([text.frequency_list[t] / text.text_length for t in sorted(text.frequency_list.keys())])
+    kld = _distances_kld(text)
+    weighted_mean = np.multiply(kld, word_probs).sum()
+    return weighted_mean
+
+
+def distances_wasted_bits_per_type(text):
+    """The average number of bits per type that would be wasted if we
+    encoded the observed distances between tokens of the same type
+    with a code based on the geometric distribution.
+
+    For each type, we compute the Kullback-Leibler divergence of
+    observed distances from the geometric distribution, then we take
+    the arithmetic mean of all types.
+
+    Larger scores indicate greater deviations from the geometric
+    distribution, i.e. greater non-randomness.
+
+    """
+    kld = _distances_kld(text)
+    return kld.mean()
 
 
 # ---------------------------------- #
