@@ -390,6 +390,23 @@ def kl_divergence(text, n_parts):
     return np.mean(kld_scores)
 
 
+def _get_distances(text):
+    distances = np.zeros((text.vocabulary_size, text.text_length))
+    word_idx = {t: i for i, t in enumerate(sorted(text.frequency_list.keys()))}
+    first, last = {}, {}
+    for i, token in enumerate(text.tokens):
+        if token in first:
+            dist = i - last[token]
+            distances[word_idx[token], dist - 1] += 1
+        else:
+            first[token] = i
+        last[token] = i
+    for token, idx in word_idx.items():
+        dist = first[token] + text.text_length - last[token]
+        distances[idx, dist - 1] += 1
+    return distances
+
+
 # ---------------------------------- #
 # PARAMETERS OF PROBABILISTIC MODELS #
 # ---------------------------------- #
