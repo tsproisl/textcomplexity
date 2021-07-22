@@ -5,10 +5,11 @@ import collections
 
 class Text:
 
-    def __init__(self, tokens, text_length, vocabulary_size, frequency_spectrum):
+    def __init__(self, tokens, text_length, vocabulary_size, frequency_list, frequency_spectrum):
         self.tokens = tokens
         self.text_length = text_length
         self.vocabulary_size = vocabulary_size
+        self.frequency_list = frequency_list
         self.frequency_spectrum = frequency_spectrum
 
     @classmethod
@@ -18,4 +19,4 @@ class Text:
         frequency_list = collections.Counter(tokens)
         vocabulary_size = len(frequency_list)
         frequency_spectrum = dict(collections.Counter(frequency_list.values()))
-        return cls(tokens, text_length, vocabulary_size, frequency_spectrum)
+        return cls(tokens, text_length, vocabulary_size, frequency_list, frequency_spectrum)

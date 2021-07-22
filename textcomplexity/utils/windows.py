@@ -54,7 +54,7 @@ def moving_windows(tokens, window_size, step_size=1):
     frequencies = collections.Counter(deque)
     vocabulary_size = len(frequencies)
     frequency_spectrum = collections.Counter(frequencies.values())
-    yield Text(list(deque), window_size, vocabulary_size, dict(frequency_spectrum))
+    yield Text(list(deque), window_size, vocabulary_size, frequencies, dict(frequency_spectrum))
     for i in range(window_size, text_length - step_size + 1, step_size):
         for j in range(step_size):
             new = tokens[i + j]
@@ -80,4 +80,4 @@ def moving_windows(tokens, window_size, step_size=1):
                 if f_old_1 != 0:
                     frequency_spectrum[f_old_1] += 1
                 vocabulary_size = len(frequencies)
-        yield Text(list(deque), window_size, vocabulary_size, dict(frequency_spectrum))
+        yield Text(list(deque), window_size, vocabulary_size, frequencies, dict(frequency_spectrum))
