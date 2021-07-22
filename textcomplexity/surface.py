@@ -456,6 +456,56 @@ def distances_wasted_bits_per_type(text):
     return kld.mean()
 
 
+def _distances_mean_deviations(text, func):
+    distances = _get_distances(text)
+    expectations = np.array([text.text_length / text.frequency_list[t] for t in sorted(text.frequency_list.keys())])
+    raw_deviation_scores = func(np.arange(1, text.text_length + 1) - expectations.reshape(-1, 1))
+    deviations = np.divide(np.multiply(distances, raw_deviation_scores).sum(axis=1), distances.sum(axis=1))
+    return deviations
+
+
+def distances_weighted_msd(text):
+    """Weighted average (weights = relative frequencies of types) of the
+    mean squared deviation of observed distances between tokens of the
+    same type from expected distances.
+
+    """
+    word_probs = np.array([text.frequency_list[t] / text.text_length for t in sorted(text.frequency_list.keys())])
+    deviations = _distances_mean_deviations(text, np.square)
+    weighted_mean = np.multiply(deviations, word_probs).sum()
+    return weighted_mean
+
+
+def distances_mean_msd(text):
+    """Arithmetic mean of the mean squared deviation of observed distances
+    between tokens of the same type from expected distances.
+
+    """
+    deviations = _distances_mean_deviations(text, np.square)
+    return deviations.mean()
+
+
+def distances_weighted_mad(text):
+    """Weighted average (weights = relative frequencies of types) of the
+    mean absolute deviation of observed distances between tokens of
+    the same type from expected distances.
+
+    """
+    word_probs = np.array([text.frequency_list[t] / text.text_length for t in sorted(text.frequency_list.keys())])
+    deviations = _distances_mean_deviations(text, abs)
+    weighted_mean = np.multiply(deviations, word_probs).sum()
+    return weighted_mean
+
+
+def distances_mean_mad(text):
+    """Arithmetic mean of the mean absolute deviation of observed
+    distances between tokens of the same type from expected distances.
+
+    """
+    deviations = _distances_mean_deviations(text, abs)
+    return deviations.mean()
+
+
 # ---------------------------------- #
 # PARAMETERS OF PROBABILISTIC MODELS #
 # ---------------------------------- #
