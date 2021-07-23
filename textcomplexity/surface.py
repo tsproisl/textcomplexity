@@ -529,7 +529,7 @@ def distances_weighted_gini(text):
 
     """
     distances = _get_distances_for_gini(text)
-    ginis = {scipy.spatial.distance.squareform(scipy.spatial.distance.pdist(dists)).mean() / (2 * dists.mean()) for t, dists in distances.items()}
+    ginis = {t: scipy.spatial.distance.squareform(scipy.spatial.distance.pdist(dists.reshape(-1, 1))).mean() / (2 * dists.mean()) for t, dists in distances.items()}
     return 1 - sum([g * text.frequency_list[t] / text.text_length for t, g in ginis.items()])
 
 
@@ -540,7 +540,7 @@ def distances_mean_gini(text):
 
     """
     distances = _get_distances_for_gini(text)
-    ginis = {scipy.spatial.distance.squareform(scipy.spatial.distance.pdist(dists)).mean() / (2 * dists.mean()) for t, dists in distances.items()}
+    ginis = {t: scipy.spatial.distance.squareform(scipy.spatial.distance.pdist(dists.reshape(-1, 1))).mean() / (2 * dists.mean()) for t, dists in distances.items()}
     return 1 - statistics.mean(ginis.values())
 
 
