@@ -506,6 +506,44 @@ def distances_mean_mad(text):
     return deviations.mean()
 
 
+def _get_distances_for_gini(text):
+    distances = {t: [] for t in text.frequency_list.keys()}
+    first, last = {}, {}
+    for i, token in enumerate(text.tokens):
+        if token in first:
+            dist = i - last[token]
+            distances[token].append(dist)
+        else:
+            first[token] = i
+        last[token] = i
+    for token in distances.keys():
+        dist = first[token] + text.text_length - last[token]
+        distances[token].append(dist)
+    return {t: np.array(dists) for t, dists in distances.items()}
+
+
+def distances_weighted_gini(text):
+    """Weighted average (weights = relative frequencies of types) of the
+    Gini coefficient of the distances between tokens of the same type,
+    i.e. half the relative mean absolute difference between distances.
+
+    """
+    distances = _get_distances_for_gini(text)
+    ginis = {scipy.spatial.distance.squareform(scipy.spatial.distance.pdist(dists)).mean() / (2 * dists.mean()) for t, dists in distances.items()}
+    return 1 - sum([g * text.frequency_list[t] / text.text_length for t, g in ginis.items()])
+
+
+def distances_mean_gini(text):
+    """Weighted average (weights = relative frequencies of types) of the
+    Gini coefficient of the distances between tokens of the same type,
+    i.e. half the relative mean absolute difference between distances.
+
+    """
+    distances = _get_distances_for_gini(text)
+    ginis = {scipy.spatial.distance.squareform(scipy.spatial.distance.pdist(dists)).mean() / (2 * dists.mean()) for t, dists in distances.items()}
+    return 1 - statistics.mean(ginis.values())
+
+
 # ---------------------------------- #
 # PARAMETERS OF PROBABILISTIC MODELS #
 # ---------------------------------- #
