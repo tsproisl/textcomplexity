@@ -82,10 +82,6 @@ def dugast_u(text):
     Slatkine.
 
     """
-    # as suggested by Andreas, we decrease the vocabulary size by 1,
-    # if we only have hapaxes
-    # if text_length == vocabulary_size:
-    #     vocabulary_size -= 1
     if text.text_length == text.vocabulary_size:
         return math.nan
     return (math.log(text.text_length) ** 2) / (math.log(text.text_length) - math.log(text.vocabulary_size))
@@ -177,8 +173,6 @@ def honore_h(text):
     Bulletin 7 (2), pp. 172–177.
 
     """
-    # Similar to dugast_u, we decrease the number of hapax legomena by
-    # 1, if we only have hapaxes
     hapaxes = text.frequency_spectrum.get(1, 0)
     try:
         return 100 * (math.log(text.text_length) / (1 - (hapaxes / text.vocabulary_size)))
