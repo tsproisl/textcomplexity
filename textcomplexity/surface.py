@@ -520,12 +520,12 @@ def gini_based_dispersion(text, exclude_hapaxes=False):
     """This measure indicates how evenly the distances between tokens of
     the same type are distributed. Gini-based dispersion for a single
     type is computed as 1 - (Gini / Gini_max), where Gini is the Gini
-    coefficient of the distances and Gini_max = (N - f) * (f - 1) / (f
-    * N) is the maximum value for a type with frequency f in a text of
-    length N. This function returns the arithmetic mean of the
-    Gini-based dispersion scores for all types in the text. Returns
-    math.nan if exclude_hapaxes=True and the text only consists of
-    hapax legomena.
+    coefficient (https://en.wikipedia.org/wiki/Gini_coefficient) of
+    the distances and Gini_max = (N - f) * (f - 1) / (f * N) is the
+    maximum value for a type with frequency f in a text of length N.
+    This function returns the arithmetic mean of the Gini-based
+    dispersion scores for all types in the text. Returns math.nan if
+    exclude_hapaxes=True and the text only consists of hapax legomena.
 
     """
     distances = _get_distances_for_gini(text)
