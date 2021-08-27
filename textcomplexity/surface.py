@@ -516,26 +516,28 @@ def _get_distances_for_gini(text):
     return {t: np.array(dists) for t, dists in distances.items()}
 
 
-def distances_weighted_gini(text):
-    """Weighted average (weights = relative frequencies of types) of the
-    Gini coefficient of the distances between tokens of the same type,
-    i.e. half the relative mean absolute difference between distances.
+def gini_based_dispersion(text, exclude_hapaxes=False):
+    """This measure indicates how evenly the distances between tokens of
+    the same type are distributed. Gini-based dispersion for a single
+    type is computed as 1 - (Gini / Gini_max), where Gini is the Gini
+    coefficient of the distances and Gini_max = (N - f) * (f - 1) / (f
+    * N) is the maximum value for a type with frequency f in a text of
+    length N. This function returns the arithmetic mean of the
+    Gini-based dispersion scores for all types in the text. Returns
+    math.nan if exclude_hapaxes=True and the text only consists of
+    hapax legomena.
 
     """
     distances = _get_distances_for_gini(text)
     ginis = {t: scipy.spatial.distance.squareform(scipy.spatial.distance.pdist(dists.reshape(-1, 1))).mean() / (2 * dists.mean()) for t, dists in distances.items()}
-    return 1 - sum([g * text.frequency_list[t] / text.text_length for t, g in ginis.items()])
-
-
-def distances_mean_gini(text):
-    """Weighted average (weights = relative frequencies of types) of the
-    Gini coefficient of the distances between tokens of the same type,
-    i.e. half the relative mean absolute difference between distances.
-
-    """
-    distances = _get_distances_for_gini(text)
-    ginis = {t: scipy.spatial.distance.squareform(scipy.spatial.distance.pdist(dists.reshape(-1, 1))).mean() / (2 * dists.mean()) for t, dists in distances.items()}
-    return 1 - statistics.mean(ginis.values())
+    gini_max = {t: (text.text_length - f) * (f - 1) / (f * text.text_length) for t, f in text.frequency_list.items()}
+    dispersions = {t: 1 if g == 0 else 1 - (g / gini_max[t]) for t, g in ginis.items()}
+    if exclude_hapaxes:
+        dispersions = {t: d for t, d in dispersions.items() if text.frequency_list[t] > 1}
+    try:
+        return statistics.mean(dispersions.values())
+    except statistics.StatisticsError:
+        return math.nan
 
 
 # ---------------------------------- #
