@@ -439,7 +439,7 @@ def evenness_based_dispersion(text, exclude_hapaxes=False):
 
     """
     distances = _get_distances_for_gini(text)
-    evenness_scores = {(-1 * np.multiply(np.divide(dists, text.text_length), np.log2(np.divide(dists, text.text_length))).sum()) / math.log2(text.frequency_list[t]) if text.frequency_list[t] > 1 else 0 for t, dists in distances.items()}
+    evenness_scores = {t: (-1 * np.multiply(np.divide(dists, text.text_length), np.log2(np.divide(dists, text.text_length))).sum()) / math.log2(text.frequency_list[t]) if text.frequency_list[t] > 1 else 0 for t, dists in distances.items()}
     evenness_min = {t: ((1 - f) * (1 / text.text_length) * math.log2(1 / text.text_length) - ((text.text_length - f + 1) / text.text_length) * math.log2((text.text_length - f + 1) / text.text_length)) / math.log2(f) if f > 1 else 0 for t, f in text.frequency_list.items()}
     dispersions = {t: (e - evenness_min[t]) / (1 - evenness_min[t]) for t, e in evenness_scores.items()}
     if exclude_hapaxes:
