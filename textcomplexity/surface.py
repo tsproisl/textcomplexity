@@ -425,6 +425,31 @@ def gini_based_dispersion(text, exclude_hapaxes=False):
         return math.nan
 
 
+def evenness_based_dispersion(text, exclude_hapaxes=False):
+    """This measure indicates how evenly the distances between tokens of
+    the same type are distributed based on evenness (also known as
+    normalized entropy or efficiency). Evenness-based dispersion for a
+    single type is computed as (Evenness - Evenness_min) / (1 -
+    Evenness_min), Evenness_min = ((1 - f) * (1 / N) * log2(1 / N) -
+    ((N - f + 1) / N)) * log2((N - f + 1) / N) / log2(f) is the
+    minimum value for a type with frequency f in a text of length N.
+    This function returns the arithmetic mean of the Evenness-based
+    dispersion scores for all types in the text. Returns math.nan if
+    exclude_hapaxes=True and the text only consists of hapax legomena.
+
+    """
+    distances = _get_distances_for_gini(text)
+    evenness_scores = {(-1 * np.multiply(np.divide(dists, text.text_length), np.log2(np.divide(dists, text.text_length))).sum()) / math.log2(text.frequency_list[t]) if text.frequency_list[t] > 1 else 0 for t, dists in distances.items()}
+    evenness_min = {t: ((1 - f) * (1 / text.text_length) * math.log2(1 / text.text_length) - ((text.text_length - f + 1) / text.text_length) * math.log2((text.text_length - f + 1) / text.text_length)) / math.log2(f) if f > 1 else 0 for t, f in text.frequency_list.items()}
+    dispersions = {t: (e - evenness_min[t]) / (1 - evenness_min[t]) for t, e in evenness_scores.items()}
+    if exclude_hapaxes:
+        dispersions = {t: d for t, d in dispersions.items() if text.frequency_list[t] > 1}
+    try:
+        return statistics.mean(dispersions.values())
+    except statistics.StatisticsError:
+        return math.nan
+
+
 # ---------------------------------- #
 # PARAMETERS OF PROBABILISTIC MODELS #
 # ---------------------------------- #
