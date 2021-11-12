@@ -198,6 +198,19 @@ def evenness(text):
     return entropy(text) / math.log2(text.vocabulary_size)
 
 
+def jarvis_evenness(text):
+    """Jarvis (2013: 29) suggests “to use the standard deviation of the
+    number of tokens per type in a text” as a measure of evenness.
+
+    Jarvis, Scott (2013). “Defining and measuring lexical diversity”.
+    In: Jarvis, Scott and Daller, Michael, Vocabulary Knowledge. Human
+    ratings and automated measures. John Benjamins. 13--44.
+    https://doi.org/10.1075/sibil.47.03ch1.
+
+    """
+    return statistics.stdev(text.frequency_list.values())
+
+
 def yule_k(text):
     """Yule (1944)
 
