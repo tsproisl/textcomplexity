@@ -226,7 +226,7 @@ not computed in the command-line script.
 
 ### POS-based measures
 
-  - Lexical density
+  - Lexical density (Ure 1971)
   - Rarity (requires a reference frequency list)
 
 ### Dependency-based measures
