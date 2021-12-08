@@ -26,7 +26,7 @@ def arguments():
     parser.add_argument("--window-size", default=1000, type=int, help="Window size for vocabulary-based complexity measures (default: 1000)")
     parser.add_argument("-i", "--input-format", choices=["conllu", "tsv"], required=True, help="Format of the input files.")
     parser.add_argument("-o", "--output-format", choices=["json", "tsv"], default="json", help="Format for outputting the results.")
-    parser.add_argument("TEXT", type=argparse.FileType("r", encoding="utf-8"), nargs="+", help="Input files. Paths to files or \"-\" for STDIN. Input files need to be CoNLL-style text files with six tab-separated columns and an empty line after each sentence. The columns are: word index, word, part-of-speech tag, index of dependency head, dependency relation, phrase structure tree. Missing values can be replaced with an underscore (_).")
+    parser.add_argument("TEXT", type=argparse.FileType("r", encoding="utf-8"), nargs="+", help="Input files. Paths to files or \"-\" for STDIN. Input files need to be text files in CoNLL-U format or in our custom format with six tab-separated columns and an empty line after each sentence. Missing values can be replaced with an underscore (_). Examples for both input formats can be found in README.md")
     return parser.parse_args()
 
 
