@@ -126,6 +126,32 @@ Now you can use the wrapper script to parse your text files:
 
 ## Complexity measures
 
+### Default set of measures
+
+In our article on lexical complexity (currently in preparation) we
+argue that there are several distinct aspects (or dimensions) of
+lexical complexity and we propose a single measure for each of the
+dimensions. Most of them are implemented here.
+
+  - *Variability*: How large is the vocabulary? Measured via type-token ratio.
+  - *Evenness*: How evenly are the tokens distributed among the
+    different types? Measured via normalized entropy.
+  - *Rarity*: How many rare words are used? Measured with the help of
+    a reference frequency list.
+      - General rarity: Rarity with respect to a representative sample
+        of the language.
+      - Genre rarity: Rarity with respect to a specific genre.
+  - *Dispersion*: How evenly are the tokens of a type distributed
+    throughout the text? Measured via Gini-based dispersion (without
+    hapax legomena)
+  - *Lexical density*: How many content words are used? Measured with
+    the help of part-of-speech tags.
+  - *Surprise*: How unexpected are word choices in the text? Not
+    implemented here.
+  - *Disparity*: How semantically dissimilar are the words? Not
+    implemented here.
+
+
 ### Surface-based complexity measures
 
 #### Measures that use sample size and vocabulary size
