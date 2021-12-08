@@ -156,16 +156,16 @@ dimensions. Most of them are implemented here.
 
 #### Measures that use sample size and vocabulary size
 
-  * Type-token ratio
-  * Brunet's (1978) W
-  * Carroll's (1964) CTTR
-  * Dugast's (1978, 1979) U
-  * Dugast's (1979) k
-  * Guiraud's (1954) R
-  * Herdan's (1960, 1964) C
-  * Maas' (1972) a<sup>2</sup>
-  * Summer's S
-  * Tuldava's (1977) LN
+  - Type-token ratio
+  - Brunet's (1978) W
+  - Carroll's (1964) CTTR
+  - Dugast's (1978, 1979) U
+  - Dugast's (1979) k
+  - Guiraud's (1954) R
+  - Herdan's (1960, 1964) C
+  - Maas' (1972) a<sup>2</sup>
+  - Summer's S
+  - Tuldava's (1977) LN
 
 All of these measures correlate perfectly. Therefore, the default
 setting is to only compute the type-token ratio. If you want to
@@ -173,9 +173,9 @@ compute all of these measures, use the option `--all-measures`.
 
 #### Measures that use part of the frequency spectrum
 
-  * Honoré's (1979) H
-  * Michéa's (1969, 1971) M
-  * Sichel's (1975) S
+  - Honoré's (1979) H
+  - Michéa's (1969, 1971) M
+  - Sichel's (1975) S
 
 Michéa's M is simply the reciprocal of Sichel's S, therefore we only
 compute Sichel's S by default. If you want to compute Michéa's M as
@@ -183,13 +183,13 @@ well, use the option `--all-measures`.
 
 #### Measures that use the whole frequency spectrum
 
-  * Entropy (Shannon 1948)
-  * Evenness (= [normalized entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)#Efficiency_(normalized_entropy)))
-  * Herdan's (1955) V<sub>m</sub>
-  * Jarvis' (2013) evenness (standard deviation of tokens per type)
-  * McCarthy and Jarvis' (2010) HD-D
-  * Simpson's (1949) D
-  * Yule's (1944) K
+  - Entropy (Shannon 1948)
+  - Evenness (= [normalized entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory)#Efficiency_(normalized_entropy)))
+  - Herdan's (1955) V<sub>m</sub>
+  - Jarvis' (2013) evenness (standard deviation of tokens per type)
+  - McCarthy and Jarvis' (2010) HD-D
+  - Simpson's (1949) D
+  - Yule's (1944) K
 
 Yule's K, Simpson's D and Herdan's V<sub>m</sub> correlate perfectly.
 Therefore, the default setting is to only compute Simpson's D (which
@@ -199,20 +199,20 @@ and Herdan's V<sub>m</sub>, use the option `--all-measures`.
 
 #### Parameters of probabilistic models
 
-  * Orlov's (1983) Z
+  - Orlov's (1983) Z
 
 #### Measures that use the whole text
 
-  * Average token length
-  * Covington and McFall's (2010) MATTR
-  * Kubát and Milička's (2013) STTR
-  * MTLD (McCarthy and Jarvis 2010)
+  - Average token length
+  - Covington and McFall's (2010) MATTR
+  - Kubát and Milička's (2013) STTR
+  - MTLD (McCarthy and Jarvis 2010)
 
 
-  * Evenness-based dispersion
-  * Gini-based dispersion
-  * Gries' DP and DP<sub>norm</sub> (Gries 2008, Lijffijt and Gries 2012)
-  * Kullback-Leibler divergence (Kullback and Leibler 1951)
+  - Evenness-based dispersion
+  - Gini-based dispersion
+  - Gries' DP and DP<sub>norm</sub> (Gries 2008, Lijffijt and Gries 2012)
+  - Kullback-Leibler divergence (Kullback and Leibler 1951)
 
 DP/DP<sub>norm</sub> and KL-divergence require an additional parameter
 (the number of parts in which to split the text), therefore they are
@@ -220,9 +220,9 @@ not computed in the command-line script.
 
 ### Sentence-based complexity measures
 
-  * Punctuation per sentence
-  * Punctuation per token
-  * Sentence length in words and characters
+  - Punctuation per sentence
+  - Punctuation per token
+  - Sentence length in words and characters
 
 ### POS-based measures
 
@@ -231,26 +231,26 @@ not computed in the command-line script.
 
 ### Dependency-based measures
 
-  * Average dependency distance (Oya 2011)
-  * Closeness centrality
-  * Closeness centralization (Freeman 1978)
-  * Dependents per token
-  * Longest shortest path
-  * Outdegree centralization (Freeman 1978)
+  - Average dependency distance (Oya 2011)
+  - Closeness centrality
+  - Closeness centralization (Freeman 1978)
+  - Dependents per token
+  - Longest shortest path
+  - Outdegree centralization (Freeman 1978)
 
 ### Constituency-based measures
 
 Language-independent measures:
-  * Constituents per sentence
-  * Height of the parse trees
-  * Non-terminal constituents per sentence
+  - Constituents per sentence
+  - Height of the parse trees
+  - Non-terminal constituents per sentence
 
 Language-dependent measures (defined for German):
-  * Clauses per sentence
-  * Complex t-units per sentence
-  * Coordinate phrases per sentence
-  * Dependent clauses per sentence
-  * Noun phrases per sentence
-  * Prepositional phrases per sentence
-  * Verb phrases per sentence
-  * t-units per sentence
+  - Clauses per sentence
+  - Complex t-units per sentence
+  - Coordinate phrases per sentence
+  - Dependent clauses per sentence
+  - Noun phrases per sentence
+  - Prepositional phrases per sentence
+  - Verb phrases per sentence
+  - t-units per sentence
