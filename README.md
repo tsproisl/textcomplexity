@@ -224,6 +224,11 @@ not computed in the command-line script.
   * Punctuation per token
   * Sentence length in words and characters
 
+### POS-based measures
+
+  - Lexical density
+  - Rarity (requires a reference frequency list)
+
 ### Dependency-based measures
 
   * Average dependency distance (Oya 2011)
