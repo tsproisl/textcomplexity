@@ -72,14 +72,26 @@ def sentence_based(sentences, punct_tags):
     results = []
     pps = functools.partial(sentence.punctuation_per_sentence, punctuation=punct_tags)
     ppt = functools.partial(sentence.punctuation_per_token, punctuation=punct_tags)
-    measures = [(sentence.sentence_length_words, "average sentence length (words)"),
-                (sentence.sentence_length_characters, "average sentence length (characters)"),
-                (pps, "punctuation per sentence")]
+    slw = functools.partial(sentence.sentence_length_words, punctuation=punct_tags)
+    measures_with_punct = [(slw, "average sentence length (words)"),
+                           (pps, "punctuation per sentence")]
+    measures_wo_punct = [(sentence.sentence_length_tokens, "average sentence length (tokens)"),
+                         (sentence.sentence_length_characters, "average sentence length (characters)")]
+    if punct_tags:
+        measures = measures_with_punct + measures_wo_punct
+        results.append(Result("punctuation per token", ppt(sentences), None, None, None))
+    else:
+        measures = measures_wo_punct
     for measure, name in measures:
         value, stdev = measure(sentences)
         results.append(Result(name, value, stdev, None, None))
-    results.append(Result("punctuation per token", ppt(sentences), None, None, None))
     return results
+
+
+def pos_based(sentences, window_size, punct_tags, name_tags, open_tags):
+    """"""
+    # TODO
+    pass
 
 
 def dependency_based(graphs):
