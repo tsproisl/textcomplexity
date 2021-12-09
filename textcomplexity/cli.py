@@ -5,6 +5,7 @@ import collections
 import functools
 import itertools
 import json
+import os
 
 from textcomplexity import surface, sentence, pos, dependency, constituency
 from textcomplexity.text import Text
@@ -21,9 +22,9 @@ def arguments():
     parser.add_argument("--dep", action="store_true", help="Compute dependency-based complexity measures")
     parser.add_argument("--const", action="store_true", help="Compute constituent-based complexity measures")
     parser.add_argument("--all-measures", action="store_true", help="Compute ALL applicable complexity measures (instead of only a sensible subset)")
-    parser.add_argument("--lang", choices=["de_negra", "none"], default="none", help="Input language and parsing scheme. Some constituent-based complexity measures are only defined for certain languages or parsing schemes. Default: none (i.e. only compute language-independent measures).")
-    parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation (currently only implemented for surface-based complexity measures)")
-    parser.add_argument("--punct-tag", action="append", help="Part-of-speech tag used for punctuation. Can be used multiple times to specify multiple tags, e.g. --punct-tag $. --punct-tag $, (Default: --punct-tag PUNCT)")
+    parser.add_argument("--lang", choices=["de", "en", "other", "none"], default="none", help="Input language. Some complexity measures depend on language-specific part-of-speech tags (specified in the XPOS column of CoNLL-U files) or constituency parsing schemes. If you want to compute these measures for languages other than English or German, specify \"other\" and provide a language definition file via --lang-def. Default: none (i.e. only compute language-independent measures).")
+    parser.add_argument("--lang-def", type=argparse.FileType("r", encoding="utf-8"), help="Language definition file in JSON format. Examples can be found in README.md")
+    parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation for surface-based and pos-based complexity measures")
     parser.add_argument("--window-size", default=1000, type=int, help="Window size for vocabulary-based complexity measures (default: 1000)")
     parser.add_argument("-i", "--input-format", choices=["conllu", "tsv"], required=True, help="Format of the input files.")
     parser.add_argument("-o", "--output-format", choices=["json", "tsv"], default="json", help="Format for outputting the results.")
@@ -118,7 +119,7 @@ def dependency_based(graphs):
     return results
 
 
-def constituency_based(trees, lang):
+def constituency_based(trees, de_negra):
     """"""
     results = []
     measures_with_length = [(constituency.t_units, "t-units"),
@@ -132,7 +133,7 @@ def constituency_based(trees, lang):
     measures_wo_length = [(constituency.constituents, "constituents"),
                           (constituency.constituents_wo_leaves, "non-terminal constituents"),
                           (constituency.height, "parse tree height")]
-    if lang == "de_negra":
+    if de_negra:
         for measure, name in measures_with_length:
             value, stdev, length, length_sd = measure(trees)
             results.append(Result(name, value, stdev, length, length_sd))
@@ -140,6 +141,13 @@ def constituency_based(trees, lang):
         value, stdev = measure(trees)
         results.append(Result(name, value, stdev, None, None))
     return results
+
+
+def read_language_definition(filename):
+    """"""
+    with open(filename, encoding="utf-8") as f:
+        ld = json.load(f)
+    return ld["language"], ld["punctuation"], ld["proper_names"], ld["open_classes"], ld["most_common"]
 
 
 def main():
@@ -151,10 +159,13 @@ def main():
         args.pos = True
         args.dep = True
         args.const = True
-    punct_tags = args.punct_tag
-    if punct_tags is None:
-        punct_tags = ["PUNCT"]
-    punct_tags = set(punct_tags)
+    language, punct_tags, name_tags, open_tags, reference_frequency_list = "none", set(), set(), set(), set()
+    if args.lang == "de":
+        language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(os.path.join(os.path.dirname(os.path.abspath(__file__)), "de.json"))
+    elif args.lang == "en":
+        language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(os.path.join(os.path.dirname(os.path.abspath(__file__)), "en.json"))
+    elif args.lang == "other":
+        language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(os.path.join(os.path.dirname(os.path.abspath(__file__)), args.lang_def))
     all_results = {}
     for i, f in enumerate(args.TEXT):
         tokens, sentences, graphs, ps_trees = None, None, None, None
@@ -176,7 +187,10 @@ def main():
         if args.dep and graphs is not None:
             results.extend(dependency_based(graphs))
         if args.const and ps_trees is not None:
-            results.extend(constituency_based(ps_trees, args.lang))
+            # We assume that German constituency trees follow the
+            # NEGRA parsing scheme
+            de_negra = args.lang == "de"
+            results.extend(constituency_based(ps_trees, de_negra))
         all_results[f.name] = {}
         for r in results:
             all_results[f.name][r.name] = {"value": r.value}
