@@ -254,3 +254,49 @@ Language-dependent measures (defined for German):
   - Prepositional phrases per sentence
   - Verb phrases per sentence
   - t-units per sentence
+
+## Language definition files
+
+  - `language`: Language code
+  - `punctuation`: Language-specific part-of-speech tags used for
+    punctuation (column XPOS in CoNLL-U format)
+  - `proper_names`: Language-specific part-of-speech tags used for
+    proper names
+  - `open_classes`: Language-specific part-of-speech tags used for
+    open word classes (including proper names)
+  - `most_common`: The most frequent content words (excluding proper
+    names) and their part-of speech tags; for German and English, we
+    use the 5.000 most frequent words according to the [COW frequency
+    lists](https://www.webcorpora.org/opendata/frequencies/)
+
+```json
+{"language": "de",
+ "punctuation": ["$.", "$,", "$("],
+ "proper_names": ["NE"],
+ "open_classes": ["ADJA", "ADJD", "ITJ", "NE", "NN", "TRUNC", "VVFIN", "VVIMP", "VVINF", "VVIZU", "VVPP"],
+ "most_common": [["gibt", "VVFIN"],
+                 ["gut", "ADJD"],
+                 ["Zeit", "NN"],
+                 …
+                 ["Fahrzeugen", "NN"],
+                 ["Kopie", "NN"],
+                 ["Merkmale", "NN"]
+                ]
+}
+```
+
+```json
+{"language": "en",
+ "punctuation": [".", "," ,":", '"', "``", "(", ")", "-LRB-", "-RRB-"],
+ "proper_names": ["NNP", "NNPS"],
+ "open_classes": ["AFX", "JJ", "JJR", "JJS", "NN", "NNS", "RB", "RBR", "RBS", "UH", "VB", "VBD", "VBG", "VBN", "VBP", "VBZ"],
+ "most_common": [["is", "VBZ"],
+                 ["be", "VB"],
+                 ["was", "VBD"],
+                 …
+                 ["statistical", "JJ"],
+                 ["appearing", "VBG"],
+                 ["recipes", "NNS"]
+                ]
+}
+```
