@@ -8,7 +8,7 @@ import json
 
 from textcomplexity import surface, sentence, dependency, constituency
 from textcomplexity.text import Text
-from textcomplexity.utils import conllu, custom_tsv
+from textcomplexity.utils import conllu, custom_tsv, misc
 
 Result = collections.namedtuple("Result", ["name", "value", "stdev", "length", "length_stdev"])
 
@@ -57,7 +57,7 @@ def surface_based(tokens, window_size, all_measures):
     for measure, name, subset in measures:
         if all_measures or subset:
             name += " (disjoint windows)"
-            mean, stdev, _ = surface.bootstrap(measure, tokens, window_size, strategy="spread")
+            mean, stdev, _ = misc.bootstrap(measure, tokens, window_size, strategy="spread")
             results.append(Result(name, mean, stdev, None, None))
     text = Text.from_tokens(tokens)
     mattr = surface.mattr(text, window_size)

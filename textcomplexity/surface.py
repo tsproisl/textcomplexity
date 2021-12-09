@@ -525,29 +525,4 @@ def sttr(tokens, window_size=1000, strategy="spread"):
     http://purl.org/stefan.evert/PUB/EvertWankerlNoeth2017.pdf
 
     """
-    return bootstrap(type_token_ratio, tokens, window_size, strategy)
-
-
-# ------------- #
-# BOOTSTRAPPING #
-# ------------- #
-
-def bootstrap(measure, tokens, window_size, strategy="spread", **kwargs):
-    """Calculate bootstrap for surface-based measures as explained in
-    Evert et al. (2017).
-
-    kwargs are passed to measure
-
-    Evert, Stefan, Sebastian Wankerl, Elmar Nöth (2017). Reliable
-    measures of syntactic and lexical complexity: The case of Iris
-    Murdoch. In: Proceedings of the Corpus Linguistics 2017
-    Conference, Birmingham, UK.
-    http://purl.org/stefan.evert/PUB/EvertWankerlNoeth2017.pdf
-
-    """
-    results = []
-    for window in windows.disjoint_windows(tokens, window_size, strategy):
-        results.append(measure(window, **kwargs))
-    if len(results) == 1:
-        return results[0], 0, results
-    return statistics.mean(results), misc.confidence_interval(results), results
+    return misc.bootstrap(type_token_ratio, tokens, window_size, strategy)
