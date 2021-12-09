@@ -8,16 +8,18 @@ from textcomplexity.utils import misc
 # -----------------
 #  Sentence length
 # -----------------
-def sentence_length_words(sentences):
-    """Mean sentence length in words; also returns the standard
-    deviation.
+def sentence_length_words(sentences, punctuation):
+    """Mean sentence length in words, i.e. excluding punctuation; also
+    returns the standard deviation.
 
     """
-    return misc.average_measure(_sentence_length_words, sentences)
+    slw = functools.partial(_sentence_length_words, punctuation=punctuation)
+    return misc.average_measure(slw, sentences)
 
 
-def _sentence_length_words(s):
+def _sentence_length_words(s, punctuation):
     """Sentence length in words."""
+    return len([t for t in s if t.pos not in punctuation])
     return len(s)
 
 
