@@ -12,7 +12,7 @@ TsvToken = collections.namedtuple("TsvToken", "id word pos head deprel pstree".s
 Token = collections.namedtuple("Token", "word pos".split())
 
 
-def read_tsv_sentences(f, *, ignore_punct=False, punct_tags=None, warnings=True):
+def read_tsv_sentences(f, *, warnings=True):
     """Read a tab-separated file with six columns: word index, word,
     part-of-speech tag, index of dependency head, dependency relation,
     phrase structure tree. There must be an empty line after each
@@ -23,11 +23,7 @@ def read_tsv_sentences(f, *, ignore_punct=False, punct_tags=None, warnings=True)
         return {"word": t.word, "pos": t.pos}
 
     for sent_id, sentence in enumerate(_get_sentences(f)):
-        tokens = [t for t in sentence]
-        if ignore_punct:
-            tokens = [t for t in tokens if t.pos not in punct_tags]
-        forms = [t.word for t in tokens]
-        tokens = [Token(t.word, t.pos) for t in tokens]
+        tokens = [Token(t.word, t.pos) for t in sentence]
         if all((t.head != "_" for t in sentence)) and all((t.deprel != "_" for t in sentence)):
             g = networkx.DiGraph(sentence_id=sent_id)
             g.add_nodes_from([(i, attributes(t)) for i, t in enumerate(sentence)])
@@ -60,7 +56,7 @@ def read_tsv_sentences(f, *, ignore_punct=False, punct_tags=None, warnings=True)
                 logging.warn("Failed to construct parse tree from sentence %s: %s" % (sent_id, tree_src))
                 tree = None
         if sensible and tree is not None:
-            yield forms, tokens, g, tree
+            yield tokens, g, tree
 
 
 def _get_sentences(f):

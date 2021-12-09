@@ -147,18 +147,20 @@ def main():
     punct_tags = set(punct_tags)
     all_results = {}
     for i, f in enumerate(args.TEXT):
-        tokens, tagged, graphs, ps_trees = None, None, None, None
+        tokens, sentences, graphs, ps_trees = None, None, None, None
         if args.input_format == "conllu":
-            tokens, tagged, graphs = zip(*conllu.read_conllu_sentences(f, ignore_punct=args.ignore_punct, punct_tags=punct_tags))
-            tokens = list(itertools.chain.from_iterable(tokens))
+            sentences, graphs = zip(*conllu.read_conllu_sentences(f))
+            tokens = list(itertools.chain.from_iterable(sentences))
         elif args.input_format == "tsv":
-            tokens, tagged, graphs, ps_trees = zip(*custom_tsv.read_tsv_sentences(f, ignore_punct=args.ignore_punct, punct_tags=punct_tags))
-            tokens = list(itertools.chain.from_iterable(tokens))
+            sentences, graphs, ps_trees = zip(*custom_tsv.read_tsv_sentences(f))
+            tokens = list(itertools.chain.from_iterable(sentences))
+        if args.ignore_punct and tokens is not None:
+            tokens = [t for t in tokens if t.pos not in punct_tags]
         results = []
         if args.sur and tokens is not None:
             results.extend(surface_based(tokens, args.window_size, args.all_measures))
-        if args.sent and tagged is not None:
-            results.extend(sentence_based(tagged, punct_tags))
+        if args.sent and sentences is not None:
+            results.extend(sentence_based(sentences, punct_tags))
         if args.dep and graphs is not None:
             results.extend(dependency_based(graphs))
         if args.const and ps_trees is not None:

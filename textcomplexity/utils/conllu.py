@@ -9,20 +9,17 @@ import networkx
 from textcomplexity.utils import graph
 
 UdToken = collections.namedtuple("UdToken", "id form lemma upos xpos feats head deprel deps misc".split())
-Token = collections.namedtuple("Token", "word pos".split())
+Token = collections.namedtuple("Token", "word pos upos".split())
 
 
-def read_conllu_sentences(f, *, ignore_punct=False, punct_tags=None, warnings=True):
+def read_conllu_sentences(f, *, warnings=True):
     for sentence, sent_id in _read_conllu(f):
         tokens = _get_tokens(sentence)
-        if ignore_punct:
-            tokens = [t for t in tokens if t.upos not in punct_tags]
-        forms = [t.form for t in tokens]
-        tokens = [Token(t.form, t.upos) for t in tokens]
+        tokens = [Token(t.form, t.xpos, t.upos) for t in tokens]
         g = _create_nx_digraph(sentence, sent_id)
         sensible, explanation = graph.is_sensible_graph(g)
         if sensible:
-            yield forms, tokens, g
+            yield tokens, g
         else:
             if warnings:
                 logging.warn("Ignoring sentence with ID %s: %s" % (sent_id, explanation))
