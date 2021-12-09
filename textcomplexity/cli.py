@@ -6,7 +6,7 @@ import functools
 import itertools
 import json
 
-from textcomplexity import surface, sentence, dependency, constituency
+from textcomplexity import surface, sentence, pos, dependency, constituency
 from textcomplexity.text import Text
 from textcomplexity.utils import conllu, custom_tsv, misc
 
@@ -17,6 +17,7 @@ def arguments():
     parser = argparse.ArgumentParser(description="Compute a variety of linguistic and stylistic complexity measures.")
     parser.add_argument("--sur", action="store_true", help="Compute surface-based complexity measures")
     parser.add_argument("--sent", action="store_true", help="Compute sentence-based complexity measures")
+    parser.add_argument("--pos", action="store_true", help="Compute part-of-speech-based complexity measures")
     parser.add_argument("--dep", action="store_true", help="Compute dependency-based complexity measures")
     parser.add_argument("--const", action="store_true", help="Compute constituent-based complexity measures")
     parser.add_argument("--all-measures", action="store_true", help="Compute ALL applicable complexity measures (instead of only a sensible subset)")
@@ -88,10 +89,18 @@ def sentence_based(sentences, punct_tags):
     return results
 
 
-def pos_based(sentences, window_size, punct_tags, name_tags, open_tags):
+def pos_based(tokens, window_size, punct_tags, name_tags, open_tags, reference_frequency_list):
     """"""
-    # TODO
-    pass
+    results = []
+    lexd = functools.partial(pos.lexical_density, open_tags=open_tags)
+    rar = functools.partial(pos.rarity, reference_frequency_list=reference_frequency_list, open_tags_ex_names=(open_tags - name_tags))
+    measures = [(lexd, "lexical density"),
+                (rar, "rarity")]
+    for measure, name in measures:
+        name += " (disjoint windows)"
+        mean, stdev, _ = misc.bootstrap(measure, tokens, window_size, strategy="spread")
+        results.append(Result(name, mean, stdev, None, None))
+    return results
 
 
 def dependency_based(graphs):
@@ -139,6 +148,7 @@ def main():
     if not any((args.sur, args.sent, args.dep, args.const)):
         args.sur = True
         args.sent = True
+        args.pos = True
         args.dep = True
         args.const = True
     punct_tags = args.punct_tag
@@ -161,6 +171,8 @@ def main():
             results.extend(surface_based(tokens, args.window_size, args.all_measures))
         if args.sent and sentences is not None:
             results.extend(sentence_based(sentences, punct_tags))
+        if args.pos and tokens is not None:
+            results.extend(pos_based(tokens, args.window_size, punct_tags, name_tags, open_tags, reference_frequency_list))
         if args.dep and graphs is not None:
             results.extend(dependency_based(graphs))
         if args.const and ps_trees is not None:
