@@ -20,6 +20,18 @@ def sentence_length_words(sentences, punctuation):
 def _sentence_length_words(s, punctuation):
     """Sentence length in words."""
     return len([t for t in s if t.pos not in punctuation])
+
+
+def sentence_length_tokens(sentences):
+    """Mean sentence length in tokens, i.e. including punctuation; also
+    returns the standard deviation.
+
+    """
+    return misc.average_measure(_sentence_length_words, sentences)
+
+
+def _sentence_length_tokens(s):
+    """Sentence length in tokens."""
     return len(s)
 
 
