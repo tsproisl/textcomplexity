@@ -27,7 +27,7 @@ def sentence_length_tokens(sentences):
     returns the standard deviation.
 
     """
-    return misc.average_measure(_sentence_length_words, sentences)
+    return misc.average_measure(_sentence_length_tokens, sentences)
 
 
 def _sentence_length_tokens(s):
