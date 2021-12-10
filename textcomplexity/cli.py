@@ -104,8 +104,11 @@ def pos_based(tokens, punct_tags, name_tags, open_tags, reference_frequency_list
     results = []
     lexd = functools.partial(pos.lexical_density, open_tags=open_tags)
     rar = functools.partial(pos.rarity, reference_frequency_list=reference_frequency_list, open_tags_ex_names=(open_tags - name_tags))
-    measures = [(lexd, "lexical density", True, True, True),
-                (rar, "rarity", True, True, True)]
+    measures = []
+    if open_tags:
+        measures.append((lexd, "lexical density", True, True, True))
+    if reference_frequency_list:
+        measures.append((rar, "rarity", True, True, True))
     text = Text.from_tokens(tokens)
     for measure, name, lexical_core, core, extended_core in measures:
         if (preset == "lexical_core" and lexical_core) or (preset == "core" and core) or (preset == "extended_core" and extended_core) or (preset == "all"):

@@ -12,6 +12,7 @@ def rarity(text, reference_frequency_list, open_tags_ex_names):
     in reference_frequency_list.
 
     """
+    assert len(open_tags_ex_names) > 0, "You need to define proper names and open word classes in the language definition file"
     content_words = [t for t in zip(text.tokens, text.tags) if t[1] in open_tags_ex_names]
     rare = [t for t in content_words if t not in reference_frequency_list]
     return len(rare) / len(content_words)
