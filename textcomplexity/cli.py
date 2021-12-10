@@ -20,14 +20,14 @@ def arguments():
                "extended_core": "sichel_s honore_h simpson_d constituents_wo_leaves height t_units".split(),
                "all": ["all measures"]}
     parser = argparse.ArgumentParser(description="Compute a variety of linguistic and stylistic complexity measures.")
-    parser.add_argument("--preset", choices=["lexical_core", "core", "extended_core", "all"], default="core", help="Predefined subset of measures to compute. Default: core. lexical_core: {" + f"{', '.join(presets['lexical_core'])}" + "}; core: lexical_core + {" + f"{', '.join(presets['core'])}" + "}; extended_core: core + {" + f"{', '.join(presets['extended_core'])}" + "}; all: all measures")
+    parser.add_argument("--preset", choices=["lexical_core", "core", "extended_core", "all"], default="core", help="Predefined subset of measures to compute (default: core). lexical_core: {" + f"{', '.join(presets['lexical_core'])}" + "}; core: lexical_core + {" + f"{', '.join(presets['core'])}" + "}; extended_core: core + {" + f"{', '.join(presets['extended_core'])}" + "}; all: all measures")
     parser.add_argument("--all-measures", action="store_true", help="Compute ALL applicable complexity measures (instead of only a sensible subset)")
     parser.add_argument("--lang", choices=["de", "en", "other", "none"], default="none", help="Input language. Some complexity measures depend on language-specific part-of-speech tags (specified in the XPOS column of CoNLL-U files) or constituency parsing schemes. If you want to compute these measures for languages other than English or German, specify \"other\" and provide a language definition file via --lang-def. Default: none (i.e. only compute language-independent measures).")
     parser.add_argument("--lang-def", type=os.path.abspath, help="Language definition file in JSON format. Examples can be found in README.md")
     parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation for surface-based and pos-based complexity measures")
     parser.add_argument("--window-size", default=1000, type=int, help="Window size for vocabulary-based complexity measures (default: 1000)")
     parser.add_argument("-i", "--input-format", choices=["conllu", "tsv"], required=True, help="Format of the input files.")
-    parser.add_argument("-o", "--output-format", choices=["json", "tsv"], default="json", help="Format for outputting the results.")
+    parser.add_argument("-o", "--output-format", choices=["json", "tsv"], default="json", help="Format for outputting the results (default: json).")
     parser.add_argument("TEXT", type=argparse.FileType("r", encoding="utf-8"), nargs="+", help="Input files. Paths to files or \"-\" for STDIN. Input files need to be text files in CoNLL-U format or in our custom format with six tab-separated columns and an empty line after each sentence. Missing values can be replaced with an underscore (_). Examples for both input formats can be found in README.md")
     return parser.parse_args()
 
