@@ -32,6 +32,10 @@ setup(
     scripts=[
         'bin/txtcomplexity',
     ],
+    package_data={
+        "textcomplexity": ["de.json",
+                           "en.json"]
+    },
     url="https://github.com/tsproisl/textcomplexity",
     download_url='https://github.com/tsproisl/textcomplexity/archive/v%s.tar.gz' % version["__version__"],
     license='GNU General Public License v3 or later (GPLv3+)',
