@@ -23,7 +23,7 @@ def arguments():
     parser.add_argument("--preset", choices=["lexical_core", "core", "extended_core", "all"], default="core", help="Predefined subset of measures to compute. Default: core. lexical_core: {" + f"{', '.join(presets['lexical_core'])}" + "}; core: lexical_core + {" + f"{', '.join(presets['core'])}" + "}; extended_core: core + {" + f"{', '.join(presets['extended_core'])}" + "}; all: all measures")
     parser.add_argument("--all-measures", action="store_true", help="Compute ALL applicable complexity measures (instead of only a sensible subset)")
     parser.add_argument("--lang", choices=["de", "en", "other", "none"], default="none", help="Input language. Some complexity measures depend on language-specific part-of-speech tags (specified in the XPOS column of CoNLL-U files) or constituency parsing schemes. If you want to compute these measures for languages other than English or German, specify \"other\" and provide a language definition file via --lang-def. Default: none (i.e. only compute language-independent measures).")
-    parser.add_argument("--lang-def", type=argparse.FileType("r", encoding="utf-8"), help="Language definition file in JSON format. Examples can be found in README.md")
+    parser.add_argument("--lang-def", type=os.path.abspath, help="Language definition file in JSON format. Examples can be found in README.md")
     parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation for surface-based and pos-based complexity measures")
     parser.add_argument("--window-size", default=1000, type=int, help="Window size for vocabulary-based complexity measures (default: 1000)")
     parser.add_argument("-i", "--input-format", choices=["conllu", "tsv"], required=True, help="Format of the input files.")
@@ -171,7 +171,8 @@ def main():
     elif args.lang == "en":
         language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(os.path.join(os.path.dirname(os.path.abspath(__file__)), "en.json"))
     elif args.lang == "other":
-        language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(os.path.join(os.path.dirname(os.path.abspath(__file__)), args.lang_def))
+        assert args.lang_def is not None, "If you set --lang=other, then you must provide a language definition file via --lang-def"
+        language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(args.lang_def)
     all_results = {}
     for i, f in enumerate(args.TEXT):
         tokens, sentences, graphs, ps_trees = None, None, None, None
