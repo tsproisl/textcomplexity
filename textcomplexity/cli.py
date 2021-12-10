@@ -15,12 +15,12 @@ Result = collections.namedtuple("Result", ["name", "value", "stdev", "length", "
 
 
 def arguments():
+    presets = {"lexical_core": "type_token_ratio evenness gini_based_dispersion rarity lexical_density average_token_length".split(),
+               "core": "sentence_length_tokens sentence_length_words punctuation_per_sentence average_dependency_distance closeness_centrality dependents_per_word".split(),
+               "extended_core": "sichel_s honore_h simpson_d constituents_wo_leaves height t_units".split(),
+               "all": ["all measures"]}
     parser = argparse.ArgumentParser(description="Compute a variety of linguistic and stylistic complexity measures.")
-    parser.add_argument("--sur", action="store_true", help="Compute surface-based complexity measures")
-    parser.add_argument("--sent", action="store_true", help="Compute sentence-based complexity measures")
-    parser.add_argument("--pos", action="store_true", help="Compute part-of-speech-based complexity measures")
-    parser.add_argument("--dep", action="store_true", help="Compute dependency-based complexity measures")
-    parser.add_argument("--const", action="store_true", help="Compute constituent-based complexity measures")
+    parser.add_argument("--preset", choices=["lexical_core", "core", "extended_core", "all"], default="core", help="Predefined subset of measures to compute. Default: core. lexical_core: {" + f"{', '.join(presets['lexical_core'])}" + "}; core: lexical_core + {" + f"{', '.join(presets['core'])}" + "}; extended_core: core + {" + f"{', '.join(presets['extended_core'])}" + "}; all: all measures")
     parser.add_argument("--all-measures", action="store_true", help="Compute ALL applicable complexity measures (instead of only a sensible subset)")
     parser.add_argument("--lang", choices=["de", "en", "other", "none"], default="none", help="Input language. Some complexity measures depend on language-specific part-of-speech tags (specified in the XPOS column of CoNLL-U files) or constituency parsing schemes. If you want to compute these measures for languages other than English or German, specify \"other\" and provide a language definition file via --lang-def. Default: none (i.e. only compute language-independent measures).")
     parser.add_argument("--lang-def", type=argparse.FileType("r", encoding="utf-8"), help="Language definition file in JSON format. Examples can be found in README.md")
@@ -32,113 +32,126 @@ def arguments():
     return parser.parse_args()
 
 
-def surface_based(tokens, window_size, all_measures):
+def surface_based(tokens, window_size, preset):
     """"""
     results = []
-    measures = [(surface.type_token_ratio, "type-token ratio", True),
-                (surface.guiraud_r, "Guiraud's R", False),
-                (surface.herdan_c, "Herdan's C", False),
-                (surface.dugast_k, "Dugast's k", False),
-                (surface.maas_a2, "Maas' a²", False),
-                (surface.dugast_u, "Dugast's U", False),
-                (surface.tuldava_ln, "Tuldava's LN", False),
-                (surface.brunet_w, "Brunet's W", False),
-                (surface.cttr, "CTTR", False),
-                (surface.summer_s, "Summer's S", False),
-                (surface.sichel_s, "Sichel's S", True),
-                (surface.michea_m, "Michéa's M", False),
-                (surface.honore_h, "Honoré's H", True),
-                (surface.entropy, "Entropy", True),
-                (surface.evenness, "Evenness", True),
-                (surface.yule_k, "Yule's K", False),
-                (surface.simpson_d, "Simpson's D", True),
-                (surface.herdan_vm, "Herdan's Vm", False),
-                (surface.hdd, "HD-D", True),
-                (surface.average_token_length, "average token length", True),
-                (surface.orlov_z, "Orlov's Z", True)]
-    for measure, name, subset in measures:
-        if all_measures or subset:
+    gbd = functools.partial(surface.gini_based_dispersion, exclude_hapaxes=True)
+    ebd = functools.partial(surface.evenness_based_dispersion, exclude_hapaxes=True)
+    measures = [(surface.type_token_ratio, "type-token ratio", True, True, True),
+                (surface.guiraud_r, "Guiraud's R", False, False, False),
+                (surface.herdan_c, "Herdan's C", False, False, False),
+                (surface.dugast_k, "Dugast's k", False, False, False),
+                (surface.maas_a2, "Maas' a²", False, False, False),
+                (surface.dugast_u, "Dugast's U", False, False, False),
+                (surface.tuldava_ln, "Tuldava's LN", False, False, False),
+                (surface.brunet_w, "Brunet's W", False, False, False),
+                (surface.cttr, "CTTR", False, False, False),
+                (surface.summer_s, "Summer's S", False, False, False),
+                (surface.sichel_s, "Sichel's S", False, False, True),
+                (surface.michea_m, "Michéa's M", False, False, False),
+                (surface.honore_h, "Honoré's H", False, False, True),
+                (surface.entropy, "entropy", False, False, False),
+                (surface.evenness, "evenness", True, True, True),
+                (surface.jarvis_evenness, "Jarvis's evenness", False, False, False),
+                (surface.yule_k, "Yule's K", False, False, False),
+                (surface.simpson_d, "Simpson's D", False, False, True),
+                (surface.herdan_vm, "Herdan's Vm", False, False, False),
+                (surface.hdd, "HD-D", False, False, False),
+                (surface.average_token_length, "average token length", True, True, True),
+                (surface.orlov_z, "Orlov's Z", False, False, False),
+                (gbd, "Gini-based dispersion", True, True, True),
+                (ebd, "evenness-based dispersion", True, True, True),
+                ]
+    for measure, name, lexical_core, core, extended_core in measures:
+        if (preset == "lexical_core" and lexical_core) or (preset == "core" and core) or (preset == "extended_core" and extended_core) or (preset == "all"):
             name += " (disjoint windows)"
             mean, stdev, _ = misc.bootstrap(measure, tokens, window_size, strategy="spread")
             results.append(Result(name, mean, stdev, None, None))
-    text = Text.from_tokens(tokens)
-    mattr = surface.mattr(text, window_size)
-    results.append(Result("type-token ratio (moving windows)", mattr, None, None, None))
-    mtld = surface.mtld(text)
-    results.append(Result("MTLD", mtld, None, None, None))
+    if preset == "all":
+        text = Text.from_tokens(tokens)
+        mattr = surface.mattr(text, window_size)
+        results.append(Result("type-token ratio (moving windows)", mattr, None, None, None))
+        mtld = surface.mtld(text)
+        results.append(Result("MTLD", mtld, None, None, None))
     return results
 
 
-def sentence_based(sentences, punct_tags):
+def sentence_based(sentences, punct_tags, preset):
     """"""
     results = []
     pps = functools.partial(sentence.punctuation_per_sentence, punctuation=punct_tags)
     ppt = functools.partial(sentence.punctuation_per_token, punctuation=punct_tags)
     slw = functools.partial(sentence.sentence_length_words, punctuation=punct_tags)
-    measures_with_punct = [(slw, "average sentence length (words)"),
-                           (pps, "punctuation per sentence")]
-    measures_wo_punct = [(sentence.sentence_length_tokens, "average sentence length (tokens)"),
-                         (sentence.sentence_length_characters, "average sentence length (characters)")]
+    measures_with_punct = [(slw, "average sentence length (words)", False, True, True),
+                           (pps, "punctuation per sentence", False, True, True)]
+    measures_wo_punct = [(sentence.sentence_length_tokens, "average sentence length (tokens)", False, True, True),
+                         (sentence.sentence_length_characters, "average sentence length (characters)", False, False, False)]
     if punct_tags:
         measures = measures_with_punct + measures_wo_punct
-        results.append(Result("punctuation per token", ppt(sentences), None, None, None))
+        if preset == "all":
+            results.append(Result("punctuation per token", ppt(sentences), None, None, None))
     else:
         measures = measures_wo_punct
-    for measure, name in measures:
-        value, stdev = measure(sentences)
-        results.append(Result(name, value, stdev, None, None))
+    for measure, name, lexical_core, core, extended_core in measures:
+        if (preset == "lexical_core" and lexical_core) or (preset == "core" and core) or (preset == "extended_core" and extended_core) or (preset == "all"):
+            value, stdev = measure(sentences)
+            results.append(Result(name, value, stdev, None, None))
     return results
 
 
-def pos_based(tokens, punct_tags, name_tags, open_tags, reference_frequency_list):
+def pos_based(tokens, punct_tags, name_tags, open_tags, reference_frequency_list, preset):
     """"""
     results = []
     lexd = functools.partial(pos.lexical_density, open_tags=open_tags)
     rar = functools.partial(pos.rarity, reference_frequency_list=reference_frequency_list, open_tags_ex_names=(open_tags - name_tags))
-    measures = [(lexd, "lexical density"),
-                (rar, "rarity")]
+    measures = [(lexd, "lexical density", True, True, True),
+                (rar, "rarity", True, True, True)]
     text = Text.from_tokens(tokens)
-    for measure, name in measures:
-        results.append(Result(name, measure(text), None, None, None))
+    for measure, name, lexical_core, core, extended_core in measures:
+        if (preset == "lexical_core" and lexical_core) or (preset == "core" and core) or (preset == "extended_core" and extended_core) or (preset == "all"):
+            results.append(Result(name, measure(text), None, None, None))
     return results
 
 
-def dependency_based(graphs):
+def dependency_based(graphs, preset):
     """"""
     results = []
-    measures = [(dependency.average_dependency_distance, "average dependency distance"),
-                (dependency.closeness_centrality, "closeness centrality"),
-                (dependency.outdegree_centralization, "outdegree centralization"),
-                (dependency.closeness_centralization, "closeness centralization"),
-                (dependency.longest_shortest_path, "longest shortest path"),
-                (dependency.dependents_per_word, "dependents per word")]
-    for measure, name in measures:
-        value, stdev = measure(graphs)
-        results.append(Result(name, value, stdev, None, None))
+    measures = [(dependency.average_dependency_distance, "average dependency distance", False, True, True),
+                (dependency.closeness_centrality, "closeness centrality", False, True, True),
+                (dependency.outdegree_centralization, "outdegree centralization", False, False, False),
+                (dependency.closeness_centralization, "closeness centralization", False, False, False),
+                (dependency.longest_shortest_path, "longest shortest path", False, False, False),
+                (dependency.dependents_per_word, "dependents per word", False, True, True)]
+    for measure, name, lexical_core, core, extended_core in measures:
+        if (preset == "lexical_core" and lexical_core) or (preset == "core" and core) or (preset == "extended_core" and extended_core) or (preset == "all"):
+            value, stdev = measure(graphs)
+            results.append(Result(name, value, stdev, None, None))
     return results
 
 
-def constituency_based(trees, de_negra):
+def constituency_based(trees, de_negra, preset):
     """"""
     results = []
-    measures_with_length = [(constituency.t_units, "t-units"),
-                            (constituency.complex_t_units, "complex t-units"),
-                            (constituency.clauses, "clauses"),
-                            (constituency.dependent_clauses, "dependent clauses"),
-                            (constituency.nps, "noun phrases"),
-                            (constituency.vps, "verb phrases"),
-                            (constituency.pps, "prepositional phrases"),
-                            (constituency.coordinate_phrases, "coordinate phrases")]
-    measures_wo_length = [(constituency.constituents, "constituents"),
-                          (constituency.constituents_wo_leaves, "non-terminal constituents"),
-                          (constituency.height, "parse tree height")]
+    measures_with_length = [(constituency.t_units, "t-units", False, False, True),
+                            (constituency.complex_t_units, "complex t-units", False, False, False),
+                            (constituency.clauses, "clauses", False, False, False),
+                            (constituency.dependent_clauses, "dependent clauses", False, False, False),
+                            (constituency.nps, "noun phrases", False, False, False),
+                            (constituency.vps, "verb phrases", False, False, False),
+                            (constituency.pps, "prepositional phrases", False, False, False),
+                            (constituency.coordinate_phrases, "coordinate phrases", False, False, False)]
+    measures_wo_length = [(constituency.constituents, "constituents", False, False, False),
+                          (constituency.constituents_wo_leaves, "non-terminal constituents", False, False, True),
+                          (constituency.height, "parse tree height", False, False, True)]
     if de_negra:
-        for measure, name in measures_with_length:
-            value, stdev, length, length_sd = measure(trees)
-            results.append(Result(name, value, stdev, length, length_sd))
-    for measure, name in measures_wo_length:
-        value, stdev = measure(trees)
-        results.append(Result(name, value, stdev, None, None))
+        for measure, name, lexical_core, core, extended_core in measures_with_length:
+            if (preset == "lexical_core" and lexical_core) or (preset == "core" and core) or (preset == "extended_core" and extended_core) or (preset == "all"):
+                value, stdev, length, length_sd = measure(trees)
+                results.append(Result(name, value, stdev, length, length_sd))
+    for measure, name, lexical_core, core, extended_core in measures_wo_length:
+        if (preset == "lexical_core" and lexical_core) or (preset == "core" and core) or (preset == "extended_core" and extended_core) or (preset == "all"):
+            value, stdev = measure(trees)
+            results.append(Result(name, value, stdev, None, None))
     return results
 
 
@@ -152,12 +165,6 @@ def read_language_definition(filename):
 def main():
     """"""
     args = arguments()
-    if not any((args.sur, args.sent, args.dep, args.const)):
-        args.sur = True
-        args.sent = True
-        args.pos = True
-        args.dep = True
-        args.const = True
     language, punct_tags, name_tags, open_tags, reference_frequency_list = "none", set(), set(), set(), set()
     if args.lang == "de":
         language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(os.path.join(os.path.dirname(os.path.abspath(__file__)), "de.json"))
@@ -177,19 +184,15 @@ def main():
         if args.ignore_punct and tokens is not None:
             tokens = [t for t in tokens if t.pos not in punct_tags]
         results = []
-        if args.sur and tokens is not None:
-            results.extend(surface_based(tokens, args.window_size, args.all_measures))
-        if args.sent and sentences is not None:
-            results.extend(sentence_based(sentences, punct_tags))
-        if args.pos and tokens is not None:
-            results.extend(pos_based(tokens, punct_tags, name_tags, open_tags, reference_frequency_list))
-        if args.dep and graphs is not None:
-            results.extend(dependency_based(graphs))
-        if args.const and ps_trees is not None:
+        results.extend(surface_based(tokens, args.window_size, args.preset))
+        results.extend(pos_based(tokens, punct_tags, name_tags, open_tags, reference_frequency_list, args.preset))
+        results.extend(sentence_based(sentences, punct_tags, args.preset))
+        results.extend(dependency_based(graphs, args.preset))
+        if ps_trees is not None:
             # We assume that German constituency trees follow the
             # NEGRA parsing scheme
             de_negra = args.lang == "de"
-            results.extend(constituency_based(ps_trees, de_negra))
+            results.extend(constituency_based(ps_trees, de_negra, args.preset))
         all_results[f.name] = {}
         for r in results:
             all_results[f.name][r.name] = {"value": r.value}
