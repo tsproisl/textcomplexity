@@ -95,30 +95,17 @@ is available via:
 
     txtcomplexity -h
 
-### Utility scripts: From raw text to CONLL-U
+### Utility script: From raw text to CONLL-U
 
 Getting the input format right can sometimes be a bit tricky.
-Therefore, we provide simple wrapper scripts around two
-state-of-the-art NLP pipelines,
-[stanza](https://stanfordnlp.github.io/stanza/) and
-[spaCy](https://spacy.io/). You can find the scripts in the `utils/`
-subdirectory of this repository.
-
-#### stanza
+Therefore, we provide a simple wrapper script around
+[stanza](https://stanfordnlp.github.io/stanza/), a state-of-the-art
+NLP pipeline, which you can find in the `utils/` subdirectory of this
+repository.
 
 First, you need to install stanza:
 
     pip install stanza
-
-Now you can use the wrapper script to parse your text files:
-
-    run_stanza.py --language <language> --output-dir <directory> <file> …
-
-#### spaCy
-
-First, you need to install spaCy:
-
-    pip install -U spacy spacy-lookups-data
 
 Now you can use the wrapper script to parse your text files:
 
