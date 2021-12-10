@@ -159,7 +159,7 @@ def read_language_definition(filename):
     """"""
     with open(filename, encoding="utf-8") as f:
         ld = json.load(f)
-    return ld["language"], ld["punctuation"], ld["proper_names"], ld["open_classes"], ld["most_common"]
+    return ld["language"], set(ld["punctuation"]), set(ld["proper_names"]), set(ld["open_classes"]), set([(t, f) for t, f in ld["most_common"]])
 
 
 def main():
