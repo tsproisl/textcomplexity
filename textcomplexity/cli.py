@@ -90,17 +90,16 @@ def sentence_based(sentences, punct_tags):
     return results
 
 
-def pos_based(tokens, window_size, punct_tags, name_tags, open_tags, reference_frequency_list):
+def pos_based(tokens, punct_tags, name_tags, open_tags, reference_frequency_list):
     """"""
     results = []
     lexd = functools.partial(pos.lexical_density, open_tags=open_tags)
     rar = functools.partial(pos.rarity, reference_frequency_list=reference_frequency_list, open_tags_ex_names=(open_tags - name_tags))
     measures = [(lexd, "lexical density"),
                 (rar, "rarity")]
+    text = Text.from_tokens(tokens)
     for measure, name in measures:
-        name += " (disjoint windows)"
-        mean, stdev, _ = misc.bootstrap(measure, tokens, window_size, strategy="spread")
-        results.append(Result(name, mean, stdev, None, None))
+        results.append(Result(name, measure(text), None, None, None))
     return results
 
 
@@ -183,7 +182,7 @@ def main():
         if args.sent and sentences is not None:
             results.extend(sentence_based(sentences, punct_tags))
         if args.pos and tokens is not None:
-            results.extend(pos_based(tokens, args.window_size, punct_tags, name_tags, open_tags, reference_frequency_list))
+            results.extend(pos_based(tokens, punct_tags, name_tags, open_tags, reference_frequency_list))
         if args.dep and graphs is not None:
             results.extend(dependency_based(graphs))
         if args.const and ps_trees is not None:
