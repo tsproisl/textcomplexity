@@ -12,7 +12,7 @@ TsvToken = collections.namedtuple("TsvToken", "id word pos head deprel pstree".s
 Token = collections.namedtuple("Token", "word pos".split())
 
 
-def read_tsv_sentences(f, *, warnings=True):
+def read_tsv_sentences(f, *, ignore_case=False, warnings=True):
     """Read a tab-separated file with six columns: word index, word,
     part-of-speech tag, index of dependency head, dependency relation,
     phrase structure tree. There must be an empty line after each
@@ -22,7 +22,7 @@ def read_tsv_sentences(f, *, warnings=True):
     def attributes(t):
         return {"word": t.word, "pos": t.pos}
 
-    for sent_id, sentence in enumerate(_get_sentences(f)):
+    for sent_id, sentence in enumerate(_get_sentences(f, ignore_case)):
         tokens = [Token(t.word, t.pos) for t in sentence]
         if all((t.head != "_" for t in sentence)) and all((t.deprel != "_" for t in sentence)):
             g = networkx.DiGraph(sentence_id=sent_id)
@@ -59,7 +59,7 @@ def read_tsv_sentences(f, *, warnings=True):
             yield tokens, g, tree
 
 
-def _get_sentences(f):
+def _get_sentences(f, ignore_case):
     """A generator over the sentences in f."""
     sentence = []
     for line in f:
@@ -69,6 +69,8 @@ def _get_sentences(f):
             sentence = []
         else:
             fields = line.split("\t")
+            if ignore_case:
+                fields[1] = fields[1].lower()
             sentence.append(TsvToken(*fields))
     if len(sentence) > 0:
         yield sentence

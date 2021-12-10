@@ -25,6 +25,7 @@ def arguments():
     parser.add_argument("--lang", choices=["de", "en", "other", "none"], default="none", help="Input language. Some complexity measures depend on language-specific part-of-speech tags (specified in the XPOS column of CoNLL-U files) or constituency parsing schemes. If you want to compute these measures for languages other than English or German, specify \"other\" and provide a language definition file via --lang-def. Default: none (i.e. only compute language-independent measures).")
     parser.add_argument("--lang-def", type=os.path.abspath, help="Language definition file in JSON format. Examples can be found in README.md")
     parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation for surface-based and pos-based complexity measures")
+    parser.add_argument("--ignore-case", action="store_true", help="Ignore case for surface-based and pos-based complexity measures")
     parser.add_argument("--window-size", default=1000, type=int, help="Window size for vocabulary-based complexity measures (default: 1000)")
     parser.add_argument("-i", "--input-format", choices=["conllu", "tsv"], required=True, help="Format of the input files.")
     parser.add_argument("-o", "--output-format", choices=["json", "tsv"], default="json", help="Format for outputting the results (default: json).")
@@ -176,14 +177,16 @@ def main():
     elif args.lang == "other":
         assert args.lang_def is not None, "If you set --lang=other, then you must provide a language definition file via --lang-def"
         language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(args.lang_def)
+    if args.ignore_case:
+        reference_frequency_list = set([(w.lower(), t) for w, t in reference_frequency_list])
     all_results = {}
     for i, f in enumerate(args.TEXT):
         tokens, sentences, graphs, ps_trees = None, None, None, None
         if args.input_format == "conllu":
-            sentences, graphs = zip(*conllu.read_conllu_sentences(f))
+            sentences, graphs = zip(*conllu.read_conllu_sentences(f, ignore_case=args.ignore_case))
             tokens = list(itertools.chain.from_iterable(sentences))
         elif args.input_format == "tsv":
-            sentences, graphs, ps_trees = zip(*custom_tsv.read_tsv_sentences(f))
+            sentences, graphs, ps_trees = zip(*custom_tsv.read_tsv_sentences(f, ignore_case=args.ignore_case))
             tokens = list(itertools.chain.from_iterable(sentences))
         if args.ignore_punct and tokens is not None:
             tokens = [t for t in tokens if t.pos not in punct_tags]

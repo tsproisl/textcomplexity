@@ -12,8 +12,8 @@ UdToken = collections.namedtuple("UdToken", "id form lemma upos xpos feats head 
 Token = collections.namedtuple("Token", "word pos upos".split())
 
 
-def read_conllu_sentences(f, *, warnings=True):
-    for sentence, sent_id in _read_conllu(f):
+def read_conllu_sentences(f, *, ignore_case=False, warnings=True):
+    for sentence, sent_id in _read_conllu(f, ignore_case):
         tokens = _get_tokens(sentence)
         tokens = [Token(t.form, t.xpos, t.upos) for t in tokens]
         g = _create_nx_digraph(sentence, sent_id)
@@ -44,7 +44,7 @@ def _get_tokens(sentence):
     return output
 
 
-def _read_conllu(f):
+def _read_conllu(f, ignore_case):
     pattern = re.compile(r"^#\s*sent_id\s*=\s*(\S.*)$")
     sentence = []
     origid = ""
@@ -61,6 +61,8 @@ def _read_conllu(f):
             origid = ""
         else:
             fields = line.split("\t")
+            if ignore_case:
+                fields[1] = fields[1].lower()
             sentence.append(UdToken(*fields))
     if len(sentence) > 0:
         yield sentence, origid
