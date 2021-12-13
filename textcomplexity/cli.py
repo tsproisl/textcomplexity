@@ -169,6 +169,8 @@ def read_language_definition(filename):
 def main():
     """"""
     args = arguments()
+    if args.lang_def:
+        assert args.lang == "other", "If you provide a language definition file, you need to set --lang=other"
     language, punct_tags, name_tags, open_tags, reference_frequency_list = "none", set(), set(), set(), set()
     if args.lang == "de":
         language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(os.path.join(os.path.dirname(os.path.abspath(__file__)), "de.json"))
