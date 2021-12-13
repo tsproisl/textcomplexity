@@ -24,7 +24,7 @@ def arguments():
     parser.add_argument("--all-measures", action="store_true", help="Compute ALL applicable complexity measures (instead of only a sensible subset)")
     parser.add_argument("--lang", choices=["de", "en", "other", "none"], default="none", help="Input language. Some complexity measures depend on language-specific part-of-speech tags (specified in the XPOS column of CoNLL-U files) or constituency parsing schemes. If you want to compute these measures for languages other than English or German, specify \"other\" and provide a language definition file via --lang-def. Default: none (i.e. only compute language-independent measures).")
     parser.add_argument("--lang-def", type=os.path.abspath, help="Language definition file in JSON format. Examples can be found in README.md")
-    parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation for surface-based and pos-based complexity measures")
+    parser.add_argument("--ignore-punct", action="store_true", help="Ignore punctuation for surface-based and pos-based complexity measures (using the part-of-speech tags defined via --lang and --lang-def)")
     parser.add_argument("--ignore-case", action="store_true", help="Ignore case for surface-based and pos-based complexity measures")
     parser.add_argument("--window-size", default=1000, type=int, help="Window size for vocabulary-based complexity measures (default: 1000)")
     parser.add_argument("-i", "--input-format", choices=["conllu", "tsv"], required=True, help="Format of the input files.")
@@ -179,6 +179,9 @@ def main():
         language, punct_tags, name_tags, open_tags, reference_frequency_list = read_language_definition(args.lang_def)
     if args.ignore_case:
         reference_frequency_list = set([(w.lower(), t) for w, t in reference_frequency_list])
+    if args.ignore_punct:
+        assert args.lang != "none", "You can only use --ignore-punct if you specify the input language via --lang (and --lang-def, if necessary)"
+        assert punct_tags, "You can only use --ignore-punct if you specify a list of part-of-speech tags that indicate punctuation"
     all_results = {}
     for i, f in enumerate(args.TEXT):
         tokens, sentences, graphs, ps_trees = None, None, None, None
