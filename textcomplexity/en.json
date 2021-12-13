@@ -1,5 +1,5 @@
 {"language": "en",
- "punctuation": [".", "," ,":", '"', "``", "(", ")", "-LRB-", "-RRB-"],
+ "punctuation": [".", "," ,":", "\"", "``", "(", ")", "-LRB-", "-RRB-"],
  "proper_names": ["NNP", "NNPS"],
  "open_classes": ["AFX", "JJ", "JJR", "JJS", "NN", "NNS", "RB", "RBR", "RBS", "UH", "VB", "VBD", "VBG", "VBN", "VBP", "VBZ"],
  "most_common": [["is", "VBZ"],
