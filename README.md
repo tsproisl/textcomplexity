@@ -3,12 +3,16 @@
 [![PyPI](https://img.shields.io/pypi/v/textcomplexity)](https://pypi.org/project/textcomplexity/)
 
 This project implements various measures that assess the linguistic
-and stylistic complexity of (literary) texts. All surface-based,
-sentence-based and dependency-based complexity measures are language
-independent. Some of the constituency-based measures are also language
-independent, but most rely on the [NEGRA parsing
-scheme](http://www.coli.uni-saarland.de/projects/sfb378/negra-corpus/knoten.html),
-i.e. can only be applied to German data.
+and stylistic complexity of (literary) texts. There are
+[surface-based](#surface-based-measures),
+[sentence-based](#sentence-based-measures),
+[pos-based](#pos-based-measures),
+[dependency-based](#dependency-based-measures) and
+[constituency-based](#constituency-based-measures) measures. Most of
+the measures are language independent, but some of them rely on
+language-specific information (see [language definition
+files](#language-definition-files)) or are only defined for German
+(this affects some of the constituency-based measures).
 
 ## Installation
 
@@ -71,7 +75,7 @@ two sentences:
     5	nicht	PTKNEG	6	NG	(AVP*
     6	allein	ADV	4	MO	*)
     7	.	$.	6	--	*))
-    
+
     1	Sieben	CARD	2	NK	(TOP(S(NP*
     2	weitere	ADJA	3	MO	*)
     3	begleiteten	VVFIN	-1	--	*
@@ -83,15 +87,21 @@ all applicable measures (see below):
 
     txtcomplexity --input-format conllu <file>
 
-If you want to compute all applicable measures (including measures
-that are perfectly correlated with other measures), you can use the
-option `--all-measures`. You can also request specific subsets of the
-measures via the `--sur`, `--sent` `--dep` and `--const` options for
-surface-based, sentence-based, dependency-based and constituent-based
-measures. By default, the script formats its output as JSON but you
-can also request tab-separated values suitable for import in a
-spreadsheet (`--output-format tsv`). More detailed usage information
-is available via:
+The script automatically includes measures that rely on
+language-specific information, if you specify the input language. If
+your texts are in German or English, you can use `--lang de` or
+`--lang en`. If your texts are in another language, use `--lang other
+--lang-def <file>` to provide a custom [language definition
+file](#language-definition-files).
+
+If you want to compute more (or fewer) measures, indicate one of the
+predefined sets of measures (via `--preset`). You can choose to ignore
+punctuation (`--ignore-punct`) or case (`--ignore-case`) and set the
+window-size for the surface-based measures (`--window-size`). By
+default, the script formats its output as JSON but you can also
+request tab-separated values suitable for import in a spreadsheet
+(`--output-format tsv`). More detailed usage information is available
+via:
 
     txtcomplexity -h
 
@@ -113,7 +123,7 @@ Now you can use the wrapper script to parse your text files:
 
 ## Complexity measures
 
-### Default set of measures
+### Core measures of lexical complexity
 
 In our article on lexical complexity (currently in preparation) we
 argue that there are several distinct aspects (or dimensions) of
@@ -138,8 +148,7 @@ dimensions. Most of them are implemented here.
   - *Disparity*: How semantically dissimilar are the words? Not
     implemented here.
 
-
-### Surface-based complexity measures
+### Surface-based measures
 
 #### Measures that use sample size and vocabulary size
 
@@ -154,9 +163,11 @@ dimensions. Most of them are implemented here.
   - Summer's S
   - Tuldava's (1977) LN
 
-All of these measures correlate perfectly. Therefore, the default
-setting is to only compute the type-token ratio. If you want to
-compute all of these measures, use the option `--all-measures`.
+All of these measures correlate perfectly.
+
+<!-- Therefore, the default -->
+<!-- setting is to only compute the type-token ratio. If you want to -->
+<!-- compute all of these measures, use the option `--all-measures`. -->
 
 #### Measures that use part of the frequency spectrum
 
@@ -164,9 +175,11 @@ compute all of these measures, use the option `--all-measures`.
   - Michéa's (1969, 1971) M
   - Sichel's (1975) S
 
-Michéa's M is simply the reciprocal of Sichel's S, therefore we only
-compute Sichel's S by default. If you want to compute Michéa's M as
-well, use the option `--all-measures`.
+Michéa's M is the reciprocal of Sichel's S
+
+<!-- , therefore we only -->
+<!-- compute Sichel's S by default. If you want to compute Michéa's M as -->
+<!-- well, use the option `--all-measures`. -->
 
 #### Measures that use the whole frequency spectrum
 
@@ -179,10 +192,14 @@ well, use the option `--all-measures`.
   - Yule's (1944) K
 
 Yule's K, Simpson's D and Herdan's V<sub>m</sub> correlate perfectly.
-Therefore, the default setting is to only compute Simpson's D (which
+Simpson's D is perhaps the most intuitive of the three measures and
 can be interpreted as the probability of two randomly drawn tokens
-from the text being identical). If you also want to compute Yule's K
-and Herdan's V<sub>m</sub>, use the option `--all-measures`.
+from the text being identical
+
+<!-- Therefore, the default setting is to only compute Simpson's D (which -->
+<!-- can be interpreted as the probability of two randomly drawn tokens -->
+<!-- from the text being identical). If you also want to compute Yule's K -->
+<!-- and Herdan's V<sub>m</sub>, use the option `--all-measures`. -->
 
 #### Parameters of probabilistic models
 
@@ -195,7 +212,7 @@ and Herdan's V<sub>m</sub>, use the option `--all-measures`.
   - Kubát and Milička's (2013) STTR
   - MTLD (McCarthy and Jarvis 2010)
 
-
+Measures of dispersion:
   - Evenness-based dispersion
   - Gini-based dispersion
   - Gries' DP and DP<sub>norm</sub> (Gries 2008, Lijffijt and Gries 2012)
@@ -205,16 +222,27 @@ DP/DP<sub>norm</sub> and KL-divergence require an additional parameter
 (the number of parts in which to split the text), therefore they are
 not computed in the command-line script.
 
-### Sentence-based complexity measures
+### Sentence-based measures
 
+  - Sentence length in characters
+  - Sentence length in tokens
+
+Language-specific measures relying on a list of part-of-speech tags
+that indicate punctuation, see [language definition
+files](#language-definition-files):
   - Punctuation per sentence
   - Punctuation per token
-  - Sentence length in words and characters
+  - Sentence length in words
 
 ### POS-based measures
 
   - Lexical density (Ure 1971)
   - Rarity (requires a reference frequency list)
+
+These measures rely on language-specific information (lists of
+part-of-speech tags that indicate open word classes and proper names
+and lists of the most common word-tag pairs in a reference corpus),
+see [language definition files](#language-definition-files).
 
 ### Dependency-based measures
 
@@ -232,7 +260,8 @@ Language-independent measures:
   - Height of the parse trees
   - Non-terminal constituents per sentence
 
-Language-dependent measures (defined for German):
+Language-dependent measures (defined for the German [NEGRA parsing
+scheme](http://www.coli.uni-saarland.de/projects/sfb378/negra-corpus/knoten.html)):
   - Clauses per sentence
   - Complex t-units per sentence
   - Coordinate phrases per sentence
@@ -244,17 +273,31 @@ Language-dependent measures (defined for German):
 
 ## Language definition files
 
+Some complexity measures (e.g. lexical density and rarity) require
+language specific information that needs to be provided by *language
+definition files*. For German and English, the built-in language
+definition files will be used automatically (as long as you indicate
+the language via the `--lang` option). For other languages (`--lang
+other`), you need to provide the language definition files yourself.
+Language definition files are in JSON format and contain the following
+information:
+
   - `language`: Language code
-  - `punctuation`: Language-specific part-of-speech tags used for
-    punctuation (column XPOS in CoNLL-U format)
-  - `proper_names`: Language-specific part-of-speech tags used for
-    proper names
-  - `open_classes`: Language-specific part-of-speech tags used for
-    open word classes (including proper names)
-  - `most_common`: The most frequent content words (excluding proper
-    names) and their part-of speech tags; for German and English, we
-    use the 5.000 most frequent words according to the [COW frequency
+  - `punctuation`: List of language-specific part-of-speech tags used
+    for punctuation (column XPOS in CoNLL-U format)
+  - `proper_names`: List of language-specific part-of-speech tags used
+    for proper names
+  - `open_classes`: List of language-specific part-of-speech tags used
+    for open word classes (including proper names)
+  - `most_common`: List of the most frequent content words (excluding
+    proper names) and their part-of speech tags; for German and
+    English, we use the 5.000 most frequent words according to the
+    [COW frequency
     lists](https://www.webcorpora.org/opendata/frequencies/)
+
+Here is an excerpt from the [German language definition
+file](textcomplexity/de.json) (omitting most of the 5.000 most common
+content words):
 
 ```json
 {"language": "de",
@@ -272,9 +315,15 @@ Language-dependent measures (defined for German):
 }
 ```
 
+Here is an excerpt from the [English language definition
+file](textcomplexity/en.json) (omitting most of the 5.000 most common
+content words). Note that the part-of-speech tags for punctuation look
+like punctuation symbols – but we list pos tags, not punctuation
+symbols:
+
 ```json
 {"language": "en",
- "punctuation": [".", "," ,":", '"', "``", "(", ")", "-LRB-", "-RRB-"],
+ "punctuation": [".", "," ,":", "\"", "``", "(", ")", "-LRB-", "-RRB-"],
  "proper_names": ["NNP", "NNPS"],
  "open_classes": ["AFX", "JJ", "JJR", "JJS", "NN", "NNS", "RB", "RBR", "RBS", "UH", "VB", "VBD", "VBG", "VBN", "VBP", "VBZ"],
  "most_common": [["is", "VBZ"],
