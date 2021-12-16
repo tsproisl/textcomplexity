@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import collections
-import functools
 import math
 import operator
 import statistics
@@ -10,7 +9,7 @@ import numpy as np
 import scipy.optimize
 import scipy.stats
 
-from textcomplexity.utils import misc, windows
+from textcomplexity.utils import misc
 
 
 # ------------------------------------------------- #

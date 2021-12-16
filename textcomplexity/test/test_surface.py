@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import os
-import sys
 import unittest
 
 # sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from textcomplexity import surface, text
-from textcomplexity.utils import windows
+from textcomplexity import surface
+from textcomplexity.utils import text, windows
+from textcomplexity.utils.token import Token
 
 
 class TestMattr(unittest.TestCase):
@@ -20,6 +19,7 @@ class TestMattr(unittest.TestCase):
              'b', 'a', 'a', 'a', 'a', 'a', 'b', 'b', 'a', 'b', 'b', 'a', 'b',
              'b', 'a', 'b', 'a', 'b', 'a', 'a', 'a', 'a', 'a', 'a', 'b', 'a',
              'a', 'b', 'a', 'a', 'a', 'b', 'b', 'a', 'a']
+        a = [Token(tok, "N/A") for tok in a]
         a = text.Text.from_tokens(a)
         self.assertEqual(surface.mattr(a, 10), 0.2)
 
@@ -32,6 +32,7 @@ class TestMattr(unittest.TestCase):
              'j', 'c', 'a', 'j', 'c', 'h', 'i', 'a', 'f', 'c', 'j', 'g', 'd',
              'e', 'f', 'a', 'c', 'i', 'g', 'c', 'a', 'g', 'b', 'a', 'f', 'e',
              'd', 'g', 'f', 'd', 'b', 'b', 'j', 'e', 'e']
+        b = [Token(tok, "N/A") for tok in b]
         wins = windows.moving_windows(b, 10)
         results = [surface.type_token_ratio(w) for w in wins]
         mean = sum(results) / len(results)
