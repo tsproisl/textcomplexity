@@ -8,7 +8,7 @@ import json
 import os
 
 from textcomplexity import surface, sentence, pos, dependency, constituency
-from textcomplexity.text import Text
+from textcomplexity.utils.text import Text
 from textcomplexity.utils import conllu, custom_tsv, misc
 
 Result = collections.namedtuple("Result", ["name", "value", "stdev", "length", "length_stdev"])

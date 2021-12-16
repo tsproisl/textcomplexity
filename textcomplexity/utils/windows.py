@@ -3,7 +3,7 @@
 import collections
 import warnings
 
-from textcomplexity.text import Text
+from textcomplexity.utils.text import Text
 
 
 def disjoint_windows(tokens, window_size, strategy="spread"):
