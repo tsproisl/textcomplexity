@@ -7,9 +7,9 @@ import networkx
 from nltk.tree import ParentedTree
 
 from textcomplexity.utils import graph
+from textcomplexity.utils.token import Token
 
 TsvToken = collections.namedtuple("TsvToken", "id word pos head deprel pstree".split())
-Token = collections.namedtuple("Token", "word pos".split())
 
 
 def read_tsv_sentences(f, *, ignore_case=False, warnings=True):

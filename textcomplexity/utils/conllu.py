@@ -7,9 +7,9 @@ import re
 import networkx
 
 from textcomplexity.utils import graph
+from textcomplexity.utils.token import Token
 
 UdToken = collections.namedtuple("UdToken", "id form lemma upos xpos feats head deprel deps misc".split())
-Token = collections.namedtuple("Token", "word pos upos".split())
 
 
 def read_conllu_sentences(f, *, ignore_case=False, warnings=True):
