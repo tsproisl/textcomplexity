@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Version 0.11.0, 2022-03-22
+
+  - Add measures of volume, i.e. text length, to
+    `textcomplexity.surface`. Default measures: Log10 of text length
+    in tokens (`--preset core`) and log10 of text length in characters
+    (`--preset all`).
+
 ## Version 0.10.0, 2021-12-13
 
   - Add dispersion measures (Gini-based dispersion and evenness-based
