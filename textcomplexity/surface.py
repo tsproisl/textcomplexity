@@ -462,6 +462,26 @@ def evenness_based_dispersion(text, exclude_hapaxes=False):
         return math.nan
 
 
+def text_length_tokens(text):
+    """Length of the text in tokens, also known as volume."""
+    return text.text_length
+
+
+def text_length_characters(text):
+    """Length of the text in characters."""
+    return sum((len(tok) for tok in text.tokens)) + text.text_length - 1
+
+
+def log_text_length_tokens(text):
+    """Base-10 logarithm of text length in tokens."""
+    return math.log10(text_length_tokens(text))
+
+
+def log_text_length_characters(text):
+    """Base-10 logarithm of text length in characters."""
+    return math.log10(text_length_characters(text))
+
+
 # ---------------------------------- #
 # PARAMETERS OF PROBABILISTIC MODELS #
 # ---------------------------------- #

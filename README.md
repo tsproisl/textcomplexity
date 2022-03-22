@@ -210,6 +210,8 @@ from the text being identical
   - Average token length
   - Covington and McFall's (2010) MATTR
   - Kubát and Milička's (2013) STTR
+  - Log10 text length in characters
+  - Log10 text length in tokens
   - MTLD (McCarthy and Jarvis 2010)
 
 Measures of dispersion:

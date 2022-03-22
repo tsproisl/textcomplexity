@@ -16,7 +16,7 @@ Result = collections.namedtuple("Result", ["name", "value", "stdev", "length", "
 
 def arguments():
     presets = {"lexical_core": "type_token_ratio evenness gini_based_dispersion rarity lexical_density average_token_length".split(),
-               "core": "sentence_length_tokens sentence_length_words punctuation_per_sentence average_dependency_distance closeness_centrality dependents_per_word".split(),
+               "core": "log_text_length_tokens sentence_length_tokens sentence_length_words punctuation_per_sentence average_dependency_distance closeness_centrality dependents_per_word".split(),
                "extended_core": "sichel_s honore_h simpson_d constituents_wo_leaves height t_units".split(),
                "all": ["all measures"]}
     parser = argparse.ArgumentParser(description="Compute a variety of linguistic and stylistic complexity measures.")
@@ -63,13 +63,16 @@ def surface_based(tokens, window_size, preset):
                 (gbd, "Gini-based dispersion", True, True, True),
                 (ebd, "evenness-based dispersion", True, True, True),
                 ]
+    if preset != "lexical_core":
+        text = Text.from_tokens(tokens)
+        results.append(Result("log10 text length", surface.log_text_length_tokens(text), None, None, None))
     for measure, name, lexical_core, core, extended_core in measures:
         if (preset == "lexical_core" and lexical_core) or (preset == "core" and core) or (preset == "extended_core" and extended_core) or (preset == "all"):
             name += " (disjoint windows)"
             mean, stdev, _ = misc.bootstrap(measure, tokens, window_size, strategy="spread")
             results.append(Result(name, mean, stdev, None, None))
     if preset == "all":
-        text = Text.from_tokens(tokens)
+        results.append(Result("log10 text length (characters)", surface.log_text_length_characters(text), None, None, None))
         mattr = surface.mattr(text, window_size)
         results.append(Result("type-token ratio (moving windows)", mattr, None, None, None))
         mtld = surface.mtld(text)
